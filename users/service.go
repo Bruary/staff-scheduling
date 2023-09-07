@@ -12,10 +12,10 @@ import (
 )
 
 type ServiceInterface interface {
-	CreateUser(context.Context, userModels.CreateUserRequest) (*userModels.CreateUserResponse, error)
-	GetUserByEmail(context.Context, userModels.GetUserByEmailRequest) (*userModels.GetUserResponse, error)
-	GetUserByUID(ctx context.Context, userUID string) (*userModels.GetUserResponse, error)
-	DeleteUser(context.Context, userModels.DeleteUserRequest) (*userModels.DeleteUserResponse, error)
+	CreateUser(context.Context, userModels.CreateUserRequest) *userModels.CreateUserResponse
+	GetUserByEmail(context.Context, userModels.GetUserByEmailRequest) *userModels.GetUserResponse
+	GetUserByUID(ctx context.Context, userUID string) *userModels.GetUserResponse
+	DeleteUser(context.Context, userModels.DeleteUserRequest) *userModels.DeleteUserResponse
 }
 
 type Service struct {
@@ -32,7 +32,7 @@ func New(db *db.DbQueries) *Service {
 
 var _ ServiceInterface = &Service{}
 
-func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserRequest) (*userModels.CreateUserResponse, error) {
+func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserRequest) *userModels.CreateUserResponse {
 
 	if req.Email == "" {
 		return &userModels.CreateUserResponse{
@@ -40,7 +40,7 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 				ErrorType: "Missing params.",
 				ErrorMsg:  "Users email is missing.",
 			},
-		}, nil
+		}
 	}
 
 	if req.FirstName == "" {
@@ -49,7 +49,7 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 				ErrorType: "Missing params.",
 				ErrorMsg:  "Users first name is missing.",
 			},
-		}, nil
+		}
 	}
 
 	if req.LastName == "" {
@@ -58,7 +58,7 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 				ErrorType: "Missing params.",
 				ErrorMsg:  "Users last name is missing.",
 			},
-		}, nil
+		}
 	}
 
 	if req.Password == "" {
@@ -67,10 +67,10 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 				ErrorType: "Missing params.",
 				ErrorMsg:  "Password is required.",
 			},
-		}, nil
+		}
 	}
 
-	resp, _ := s.GetUserByEmail(ctx, userModels.GetUserByEmailRequest{
+	resp := s.GetUserByEmail(ctx, userModels.GetUserByEmailRequest{
 		Email: req.Email,
 	})
 
@@ -81,7 +81,7 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 				ErrorType: "User already exists.",
 				ErrorMsg:  "User is already registered",
 			},
-		}, nil
+		}
 	}
 
 	params := sqlc.CreateUserParams{
@@ -99,7 +99,7 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 				ErrorType: "Unknown error",
 				ErrorMsg:  err.Error(),
 			},
-		}, nil
+		}
 	}
 
 	return &userModels.CreateUserResponse{
@@ -115,10 +115,10 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 			Updated:   user.Updated.String(),
 			Deleted:   user.Deleted.Time.String(),
 		},
-	}, nil
+	}
 }
 
-func (s *Service) GetUserByEmail(ctx context.Context, req userModels.GetUserByEmailRequest) (*userModels.GetUserResponse, error) {
+func (s *Service) GetUserByEmail(ctx context.Context, req userModels.GetUserByEmailRequest) *userModels.GetUserResponse {
 
 	var (
 		user sqlc.User
@@ -131,7 +131,7 @@ func (s *Service) GetUserByEmail(ctx context.Context, req userModels.GetUserByEm
 				ErrorType: "Missing Parameters",
 				ErrorMsg:  "Missing parameters, email and phone number could not be found.",
 			},
-		}, nil
+		}
 	}
 
 	user, err = s.Db.GetUserByEmail(ctx, req.Email)
@@ -142,7 +142,7 @@ func (s *Service) GetUserByEmail(ctx context.Context, req userModels.GetUserByEm
 					ErrorType: "User does not exist.",
 					ErrorMsg:  err.Error(),
 				},
-			}, nil
+			}
 
 		} else {
 			return &userModels.GetUserResponse{
@@ -150,7 +150,7 @@ func (s *Service) GetUserByEmail(ctx context.Context, req userModels.GetUserByEm
 					ErrorType: "Unknown error.",
 					ErrorMsg:  err.Error(),
 				},
-			}, nil
+			}
 		}
 	}
 
@@ -166,11 +166,11 @@ func (s *Service) GetUserByEmail(ctx context.Context, req userModels.GetUserByEm
 			Updated:   user.Updated.String(),
 			Deleted:   user.Deleted.Time.String(),
 		},
-	}, nil
+	}
 
 }
 
-func (s *Service) GetUserByUID(ctx context.Context, userUID string) (*userModels.GetUserResponse, error) {
+func (s *Service) GetUserByUID(ctx context.Context, userUID string) *userModels.GetUserResponse {
 
 	var (
 		user sqlc.User
@@ -183,7 +183,7 @@ func (s *Service) GetUserByUID(ctx context.Context, userUID string) (*userModels
 				ErrorType: "Missing Parameters",
 				ErrorMsg:  "Missing parameters, user uid could not be found.",
 			},
-		}, nil
+		}
 	}
 
 	user, err = s.Db.GetUserByUid(ctx, userUID)
@@ -194,7 +194,7 @@ func (s *Service) GetUserByUID(ctx context.Context, userUID string) (*userModels
 					ErrorType: "User does not exist.",
 					ErrorMsg:  err.Error(),
 				},
-			}, nil
+			}
 
 		} else {
 			return &userModels.GetUserResponse{
@@ -202,7 +202,7 @@ func (s *Service) GetUserByUID(ctx context.Context, userUID string) (*userModels
 					ErrorType: "Unknown error.",
 					ErrorMsg:  err.Error(),
 				},
-			}, nil
+			}
 		}
 	}
 
@@ -219,10 +219,9 @@ func (s *Service) GetUserByUID(ctx context.Context, userUID string) (*userModels
 			Updated:   user.Updated.String(),
 			Deleted:   user.Deleted.Time.String(),
 		},
-	}, nil
+	}
 }
 
-func (s *Service) DeleteUser(ctx context.Context, req userModels.DeleteUserRequest) (*userModels.DeleteUserResponse, error) {
-
-	return nil, nil
+func (s *Service) DeleteUser(ctx context.Context, req userModels.DeleteUserRequest) *userModels.DeleteUserResponse {
+	return nil
 }

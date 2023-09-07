@@ -20,7 +20,6 @@ type User struct {
 type CreateUserRequest struct {
 	FirstName string `json:"firstName,omitempty"`
 	LastName  string `json:"lastName,omitempty"`
-	Fullname  string `json:"fullname,omitempty"`
 	Email     string `json:"email,omitempty"`
 	Password  string `json:"password,omitempty"`
 }

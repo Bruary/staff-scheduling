@@ -7,9 +7,9 @@ import (
 )
 
 type ControllerInterface interface {
-	CreateUser(ctx context.Context, req userModels.CreateUserRequest) (*userModels.CreateUserResponse, error)
-	GetUserByEmail(ctx context.Context, req userModels.GetUserByEmailRequest) (*userModels.GetUserResponse, error)
-	DeleteUser(context.Context, userModels.DeleteUserRequest) (*userModels.DeleteUserResponse, error)
+	CreateUser(ctx context.Context, req userModels.CreateUserRequest) *userModels.CreateUserResponse
+	GetUserByEmail(ctx context.Context, req userModels.GetUserByEmailRequest) *userModels.GetUserResponse
+	DeleteUser(context.Context, userModels.DeleteUserRequest) *userModels.DeleteUserResponse
 }
 
 type ControllerService struct {
@@ -24,38 +24,14 @@ func NewControllerService(usersService ServiceInterface) *ControllerService {
 	}
 }
 
-func (s *ControllerService) CreateUser(ctx context.Context, req userModels.CreateUserRequest) (*userModels.CreateUserResponse, error) {
-
-	resp, _ := s.usersService.CreateUser(ctx, req)
-
-	response := &userModels.CreateUserResponse{
-		BaseResponse: resp.BaseResponse,
-		User:         resp.User,
-	}
-
-	return response, nil
+func (s *ControllerService) CreateUser(ctx context.Context, req userModels.CreateUserRequest) *userModels.CreateUserResponse {
+	return s.usersService.CreateUser(ctx, req)
 }
 
-func (s *ControllerService) GetUserByEmail(ctx context.Context, req userModels.GetUserByEmailRequest) (*userModels.GetUserResponse, error) {
-
-	resp, _ := s.usersService.GetUserByEmail(ctx, req)
-
-	response := &userModels.GetUserResponse{
-		BaseResponse: resp.BaseResponse,
-		User:         resp.User,
-	}
-
-	return response, nil
+func (s *ControllerService) GetUserByEmail(ctx context.Context, req userModels.GetUserByEmailRequest) *userModels.GetUserResponse {
+	return s.usersService.GetUserByEmail(ctx, req)
 }
 
-func (s *ControllerService) DeleteUser(ctx context.Context, req userModels.DeleteUserRequest) (*userModels.DeleteUserResponse, error) {
-
-	resp, _ := s.usersService.DeleteUser(ctx, req)
-
-	response := &userModels.DeleteUserResponse{
-		BaseResponse: resp.BaseResponse,
-		User:         resp.User,
-	}
-
-	return response, nil
+func (s *ControllerService) DeleteUser(ctx context.Context, req userModels.DeleteUserRequest) *userModels.DeleteUserResponse {
+	return s.usersService.DeleteUser(ctx, req)
 }
