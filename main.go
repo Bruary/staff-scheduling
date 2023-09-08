@@ -8,10 +8,12 @@ import (
 	"github.com/Bruary/staff-scheduling/auth"
 	"github.com/Bruary/staff-scheduling/core"
 	"github.com/Bruary/staff-scheduling/db"
+	_ "github.com/Bruary/staff-scheduling/docs"
 	"github.com/Bruary/staff-scheduling/models"
 	"github.com/Bruary/staff-scheduling/users"
 	userModels "github.com/Bruary/staff-scheduling/users/models"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 	"github.com/joho/godotenv"
 )
 
@@ -37,6 +39,9 @@ func main() {
 	authController := auth.NewControllerService(authService)
 
 	app := fiber.New()
+
+	// documentaion open api
+	app.Get("/swagger/*", swagger.New())
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")

@@ -1,0 +1,75 @@
+definitions:
+  models.BaseResponse:
+    properties:
+      error_msg:
+        type: string
+      error_stack:
+        items:
+          type: string
+        type: array
+      error_type:
+        type: string
+    type: object
+  models.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+    type: object
+  models.CreateUserResponse:
+    properties:
+      baseResponse:
+        $ref: '#/definitions/models.BaseResponse'
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.User:
+    properties:
+      created:
+        type: string
+      deleted:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      password:
+        type: string
+      type:
+        type: string
+      uid:
+        type: string
+      updated:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /user:
+    post:
+      operationId: create-a-new-user
+      parameters:
+      - description: create user request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CreateUserResponse'
+      summary: Create a new user
+swagger: "2.0"
