@@ -7,6 +7,7 @@ import (
 	sqlc "github.com/Bruary/staff-scheduling/db/sqlc"
 )
 
+// mockery --dir=db/sqlc --name=DBTX --output=db/mocks --case=underscore
 type DbQueries struct {
 	provider *sqlc.Queries
 }

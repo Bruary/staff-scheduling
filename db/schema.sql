@@ -2,7 +2,7 @@ CREATE TABLE "users" (
   "id" serial PRIMARY KEY,
   "created" timestamptz NOT NULL DEFAULT (now()),
   "uid" varchar NOT NULL,
-  "type" varchar DEFAULT 'basic',
+  "type" varchar NOT NULL DEFAULT 'basic',
   "first_name" varchar NOT NULL,
   "last_name" varchar NOT NULL,
   "email" varchar NOT NULL,

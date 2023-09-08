@@ -24,7 +24,7 @@ type User struct {
 	ID        int32
 	Created   time.Time
 	Uid       string
-	Type      sql.NullString
+	Type      string
 	FirstName string
 	LastName  string
 	Email     string
