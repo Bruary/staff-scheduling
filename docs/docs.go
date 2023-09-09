@@ -15,6 +15,34 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Login",
+                "operationId": "login",
+                "parameters": [
+                    {
+                        "description": "login request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/user": {
             "post": {
                 "produces": [
@@ -45,6 +73,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "auth.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "baseResponse": {
+                    "$ref": "#/definitions/models.BaseResponse"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "models.BaseResponse": {
             "type": "object",
             "properties": {
@@ -59,6 +109,9 @@ const docTemplate = `{
                 },
                 "error_type": {
                     "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         },

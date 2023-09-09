@@ -79,10 +79,7 @@ func main() {
 		}
 
 		resp := authController.IsTokenValid(c.Context(), auth.IsTokenValidRequest{
-			Token: &auth.Token{
-				Token:     c.Get("Authorization"),
-				TokenType: auth.JWT,
-			},
+			Token: c.Get("Authorization"),
 		})
 		if resp.BaseResponse != nil {
 			resp, _ := json.Marshal(resp)
@@ -109,6 +106,24 @@ func main() {
 		}
 
 		response := usersController.CreateUser(c.Context(), req)
+		respBytes, err := json.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		c.Context().SetBody(respBytes)
+		return nil
+	})
+
+	v1.Post("/login", func(c *fiber.Ctx) error {
+		req := auth.LoginRequest{}
+
+		err := json.Unmarshal(c.Body(), &req)
+		if err != nil {
+			return err
+		}
+
+		response := authController.Login(c.Context(), req)
 		respBytes, err := json.Marshal(response)
 		if err != nil {
 			return err

@@ -1,4 +1,18 @@
 definitions:
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.LoginResponse:
+    properties:
+      baseResponse:
+        $ref: '#/definitions/models.BaseResponse'
+      token:
+        type: string
+    type: object
   models.BaseResponse:
     properties:
       error_msg:
@@ -9,6 +23,8 @@ definitions:
         type: array
       error_type:
         type: string
+      success:
+        type: boolean
     type: object
   models.CreateUserRequest:
     properties:
@@ -54,6 +70,24 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/v1/login:
+    post:
+      operationId: login
+      parameters:
+      - description: login request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LoginResponse'
+      summary: Login
   /api/v1/user:
     post:
       operationId: create-a-new-user

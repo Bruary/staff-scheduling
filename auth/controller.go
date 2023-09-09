@@ -22,6 +22,13 @@ func NewControllerService(authService ServiceInterface) *ControllerService {
 	}
 }
 
+// @Title Login
+// @Summary Login
+// @ID login
+// @Produce json
+// @Param req body LoginRequest true "login request"
+// @Success 200 {object} LoginResponse
+// @Router /api/v1/login [post]
 func (s *ControllerService) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 	return s.authService.Login(ctx, req)
 }

@@ -14,4 +14,5 @@ type EndpointConfig struct {
 
 var Endpoints = map[Endpoint]EndpointConfig{
 	{Path: "/api/v1/signup", Method: "POST"}: {RequireJWT: false, AccessLevel: models.Basic},
+	{Path: "/api/v1/login", Method: "POST"}:  {RequireJWT: false, AccessLevel: models.Basic},
 }

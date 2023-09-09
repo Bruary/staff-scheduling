@@ -63,21 +63,15 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 	if user.BaseResponse != nil {
 		return &LoginResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Unknown error",
-				ErrorMsg:  "Login. Failed to get user information",
+				ErrorType:  "Unknown error",
+				ErrorMsg:   "Login. Failed to get user information",
+				ErrorStack: append(user.BaseResponse.ErrorStack),
 			},
 		}
 	}
 
-	// if base response is not nil that means there is an error somewhere
-	if user.BaseResponse != nil {
-		return &LoginResponse{
-			BaseResponse: user.BaseResponse,
-		}
-	}
-
 	// check if credentials are correct
-	if req.Email != user.User.Email || req.Password != user.User.Password {
+	if req.Email != user.User.Email {
 		return &LoginResponse{
 			BaseResponse: &models.BaseResponse{
 				ErrorType: "Invalid credentials",
@@ -86,17 +80,24 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 		}
 	}
 
-	// generate token
+	if !users.CheckPasswordHash(req.Password, user.User.Password) {
+		return &LoginResponse{
+			BaseResponse: &models.BaseResponse{
+				ErrorType: "Invalid credentials",
+				ErrorMsg:  "Login. Invalid user credentials",
+			},
+		}
+	}
+
+	// generate JWT token
 	resp := s.CreateToken(ctx, CreateTokenRequest{
-		TokenType: JWT,
-		Email:     req.Email,
+		Email: req.Email,
 	})
 	if resp.BaseResponse != nil {
 		return &LoginResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType:  "Unknown error",
-				ErrorMsg:   "Login. Error when trying to create a token.",
-				ErrorStack: append(resp.BaseResponse.ErrorStack),
+				ErrorType: "Unknown error",
+				ErrorMsg:  "Login. Error when trying to create a token.",
 			},
 		}
 	}
@@ -108,33 +109,25 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 
 func (s *Service) CreateToken(ctx context.Context, req CreateTokenRequest) *CreateTokenResponse {
 
-	if req.TokenType == JWT {
-
-		token, err := generateJWTToken(req.Email)
-		if err != nil {
-			return &CreateTokenResponse{
-				BaseResponse: &models.BaseResponse{
-					ErrorType: "Failed to generate JWT",
-					ErrorMsg:  err.Error(),
-				},
-			}
-		}
-
+	token, err := generateJWTToken(req.Email)
+	if err != nil {
 		return &CreateTokenResponse{
-			Token: Token{
-				Token:     token,
-				TokenType: req.TokenType,
+			BaseResponse: &models.BaseResponse{
+				ErrorType: "Failed to generate JWT",
+				ErrorMsg:  err.Error(),
 			},
 		}
 	}
 
-	return nil
+	return &CreateTokenResponse{
+		Token: token,
+	}
 }
 
 func (s *Service) IsTokenValid(ctx context.Context, req IsTokenValidRequest) *IsTokenValidResponse {
 	claims := &JWTClaims{}
 
-	token, err := jwt.ParseWithClaims(req.Token.Token, claims, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(req.Token, claims, func(t *jwt.Token) (interface{}, error) {
 		return key, nil
 	})
 	if err != nil {
