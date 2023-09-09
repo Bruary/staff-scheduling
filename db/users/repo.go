@@ -13,11 +13,14 @@ type UsersRepoInterface interface {
 	GetUserByEmail(ctx context.Context, email string) (sqlc.User, error)
 	GetUserByUid(ctx context.Context, uid string) (sqlc.User, error)
 	UpdateUserPermissionLevel(ctx context.Context, params sqlc.UpdateUserPermissionLevelParams) (sqlc.User, error)
+	DeleteUser(ctx context.Context, email string) (sqlc.User, error)
 }
 
 type UsersRepo struct {
 	provider *sqlc.Queries
 }
+
+var _ UsersRepoInterface = &UsersRepo{}
 
 func New(usersRepo *sql.DB) UsersRepoInterface {
 	return &UsersRepo{
@@ -41,4 +44,8 @@ func (s *UsersRepo) GetUserByUid(ctx context.Context, uid string) (sqlc.User, er
 
 func (s *UsersRepo) UpdateUserPermissionLevel(ctx context.Context, params sqlc.UpdateUserPermissionLevelParams) (sqlc.User, error) {
 	return s.provider.UpdateUserPermissionLevel(ctx, params)
+}
+
+func (s *UsersRepo) DeleteUser(ctx context.Context, email string) (sqlc.User, error) {
+	return s.provider.DeleteUser(ctx, email)
 }

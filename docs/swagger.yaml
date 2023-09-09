@@ -8,7 +8,7 @@ definitions:
     type: object
   auth.LoginResponse:
     properties:
-      baseResponse:
+      base_response:
         $ref: '#/definitions/models.BaseResponse'
       token:
         type: string
@@ -30,16 +30,42 @@ definitions:
     properties:
       email:
         type: string
-      firstName:
+      first_name:
         type: string
-      lastName:
+      last_name:
         type: string
       password:
         type: string
     type: object
   models.CreateUserResponse:
     properties:
-      baseResponse:
+      base_response:
+        $ref: '#/definitions/models.BaseResponse'
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.DeleteUserRequest:
+    properties:
+      email:
+        type: string
+    type: object
+  models.DeleteUserResponse:
+    properties:
+      base_response:
+        $ref: '#/definitions/models.BaseResponse'
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.UpdateUserPermissionLevelRequest:
+    properties:
+      email:
+        type: string
+      permission_level:
+        type: string
+    type: object
+  models.UpdateUserPermissionLevelResponse:
+    properties:
+      base_response:
         $ref: '#/definitions/models.BaseResponse'
       user:
         $ref: '#/definitions/models.User'
@@ -52,11 +78,11 @@ definitions:
         type: string
       email:
         type: string
-      firstName:
+      first_name:
         type: string
       id:
         type: integer
-      lastName:
+      last_name:
         type: string
       password:
         type: string
@@ -88,7 +114,7 @@ paths:
           schema:
             $ref: '#/definitions/auth.LoginResponse'
       summary: Login
-  /api/v1/user:
+  /api/v1/signup:
     post:
       operationId: create-a-new-user
       parameters:
@@ -106,4 +132,40 @@ paths:
           schema:
             $ref: '#/definitions/models.CreateUserResponse'
       summary: Create a new user
+  /api/v1/user:
+    delete:
+      operationId: delete-user
+      parameters:
+      - description: delete user request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DeleteUserResponse'
+      summary: Delete user
+  /api/v1/user/permission:
+    put:
+      operationId: update-user-permission-level
+      parameters:
+      - description: update user permission request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserPermissionLevelRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UpdateUserPermissionLevelResponse'
+      summary: Update user permission level
 swagger: "2.0"

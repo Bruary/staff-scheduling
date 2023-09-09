@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
+	coreModels "github.com/Bruary/staff-scheduling/core/models"
 	sqlc "github.com/Bruary/staff-scheduling/db/sqlc"
 	usersRepoMock "github.com/Bruary/staff-scheduling/db/users/mocks"
-	coreModels "github.com/Bruary/staff-scheduling/models"
 	"github.com/Bruary/staff-scheduling/users"
 	"github.com/Bruary/staff-scheduling/users/models"
 	"github.com/stretchr/testify/assert"

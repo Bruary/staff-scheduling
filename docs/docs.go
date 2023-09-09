@@ -43,7 +43,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/user": {
+        "/api/v1/signup": {
             "post": {
                 "produces": [
                     "application/json"
@@ -70,6 +70,62 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/user": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete user",
+                "operationId": "delete-user",
+                "parameters": [
+                    {
+                        "description": "delete user request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteUserResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/permission": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update user permission level",
+                "operationId": "update-user-permission-level",
+                "parameters": [
+                    {
+                        "description": "update user permission request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateUserPermissionLevelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateUserPermissionLevelResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -87,7 +143,7 @@ const docTemplate = `{
         "auth.LoginResponse": {
             "type": "object",
             "properties": {
-                "baseResponse": {
+                "base_response": {
                     "$ref": "#/definitions/models.BaseResponse"
                 },
                 "token": {
@@ -121,10 +177,10 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstName": {
+                "first_name": {
                     "type": "string"
                 },
-                "lastName": {
+                "last_name": {
                     "type": "string"
                 },
                 "password": {
@@ -135,7 +191,48 @@ const docTemplate = `{
         "models.CreateUserResponse": {
             "type": "object",
             "properties": {
-                "baseResponse": {
+                "base_response": {
+                    "$ref": "#/definitions/models.BaseResponse"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                }
+            }
+        },
+        "models.DeleteUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DeleteUserResponse": {
+            "type": "object",
+            "properties": {
+                "base_response": {
+                    "$ref": "#/definitions/models.BaseResponse"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                }
+            }
+        },
+        "models.UpdateUserPermissionLevelRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "permission_level": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateUserPermissionLevelResponse": {
+            "type": "object",
+            "properties": {
+                "base_response": {
                     "$ref": "#/definitions/models.BaseResponse"
                 },
                 "user": {
@@ -155,13 +252,13 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstName": {
+                "first_name": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "lastName": {
+                "last_name": {
                     "type": "string"
                 },
                 "password": {

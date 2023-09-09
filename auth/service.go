@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	models "github.com/Bruary/staff-scheduling/models"
+	models "github.com/Bruary/staff-scheduling/core/models"
 	"github.com/Bruary/staff-scheduling/users"
 	userModels "github.com/Bruary/staff-scheduling/users/models"
 	jwt "github.com/golang-jwt/jwt/v4"

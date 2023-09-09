@@ -38,6 +38,30 @@ func (_m *UsersRepoInterface) CreateUser(ctx context.Context, params db.CreateUs
 	return r0, r1
 }
 
+// DeleteUser provides a mock function with given fields: ctx, email
+func (_m *UsersRepoInterface) DeleteUser(ctx context.Context, email string) (db.User, error) {
+	ret := _m.Called(ctx, email)
+
+	var r0 db.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (db.User, error)); ok {
+		return rf(ctx, email)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) db.User); ok {
+		r0 = rf(ctx, email)
+	} else {
+		r0 = ret.Get(0).(db.User)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, email)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetUserByEmail provides a mock function with given fields: ctx, email
 func (_m *UsersRepoInterface) GetUserByEmail(ctx context.Context, email string) (db.User, error) {
 	ret := _m.Called(ctx, email)

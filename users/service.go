@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"os"
 
+	"github.com/Bruary/staff-scheduling/core/models"
 	sqlc "github.com/Bruary/staff-scheduling/db/sqlc"
 	userRepo "github.com/Bruary/staff-scheduling/db/users"
-	"github.com/Bruary/staff-scheduling/models"
 	userModels "github.com/Bruary/staff-scheduling/users/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -251,7 +251,47 @@ func (s *Service) GetUserByUID(ctx context.Context, userUID string) *userModels.
 }
 
 func (s *Service) DeleteUser(ctx context.Context, req userModels.DeleteUserRequest) *userModels.DeleteUserResponse {
-	return nil
+	// validation
+	if req.Email == "" {
+		return &userModels.DeleteUserResponse{
+			BaseResponse: &models.MissingParamError,
+		}
+	}
+
+	// check if user exists
+	_, err := s.UserRepo.GetUserByEmail(ctx, req.Email)
+	if err != nil && err == sql.ErrNoRows {
+		return &userModels.DeleteUserResponse{
+			BaseResponse: &models.UserDoesNotExistError,
+		}
+	}
+
+	// delete user
+	user, err := s.UserRepo.DeleteUser(ctx, req.Email)
+	if err != nil {
+		return &userModels.DeleteUserResponse{
+			BaseResponse: &models.BaseResponse{
+				ErrorType:  models.UnknownError.ErrorType,
+				ErrorMsg:   models.UnknownError.ErrorMsg,
+				ErrorStack: append(models.UnknownError.ErrorStack, err.Error()),
+			},
+		}
+	}
+
+	return &userModels.DeleteUserResponse{
+		User: userModels.User{
+			Id:        user.ID,
+			Created:   user.Created.String(),
+			Type:      user.Type,
+			Uid:       user.Uid,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+			Password:  user.Password,
+			Updated:   user.Updated.String(),
+			Deleted:   user.Deleted.Time.String(),
+		},
+	}
 }
 
 func (s *Service) UpdateUserPermissionLevel(ctx context.Context, req userModels.UpdateUserPermissionLevelRequest) *userModels.UpdateUserPermissionLevelResponse {

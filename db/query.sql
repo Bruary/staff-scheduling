@@ -20,3 +20,6 @@ Select * from users where uid = $1;
 
 -- name: UpdateUserPermissionLevel :one
 UPDATE users SET type=$1 WHERE email=$2 RETURNING *;
+
+-- name: DeleteUser :one
+UPDATE users SET deleted = now() WHERE email = $1 RETURNING *;

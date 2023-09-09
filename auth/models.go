@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/Bruary/staff-scheduling/models"
+	"github.com/Bruary/staff-scheduling/core/models"
 )
 
 type LoginRequest struct {

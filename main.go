@@ -6,10 +6,10 @@ import (
 
 	"github.com/Bruary/staff-scheduling/auth"
 	"github.com/Bruary/staff-scheduling/core"
+	"github.com/Bruary/staff-scheduling/core/models"
 	"github.com/Bruary/staff-scheduling/db"
 	usersRepo "github.com/Bruary/staff-scheduling/db/users"
 	_ "github.com/Bruary/staff-scheduling/docs"
-	"github.com/Bruary/staff-scheduling/models"
 	"github.com/Bruary/staff-scheduling/users"
 	userModels "github.com/Bruary/staff-scheduling/users/models"
 	"github.com/gofiber/fiber/v2"
@@ -157,6 +157,24 @@ func main() {
 		}
 
 		response := usersController.UpdateUserPermissionLevel(c.Context(), req)
+		respBytes, err := json.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		c.Context().SetBody(respBytes)
+		return nil
+	})
+
+	v1.Delete("/user", func(c *fiber.Ctx) error {
+		req := userModels.DeleteUserRequest{}
+
+		err := json.Unmarshal(c.Body(), &req)
+		if err != nil {
+			return err
+		}
+
+		response := usersController.DeleteUser(c.Context(), req)
 		respBytes, err := json.Marshal(response)
 		if err != nil {
 			return err

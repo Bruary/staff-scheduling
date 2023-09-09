@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/Bruary/staff-scheduling/models"
+	"github.com/Bruary/staff-scheduling/core/models"
 )
 
 type User struct {
@@ -39,8 +39,7 @@ type GetUserResponse struct {
 }
 
 type DeleteUserRequest struct {
-	Email       string `json:"email,omitempty"`
-	PhoneNumber string `json:"phoneNumber,omitempty"`
+	Email string `json:"email,omitempty"`
 }
 
 type DeleteUserResponse struct {

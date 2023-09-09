@@ -40,6 +40,13 @@ func (s *ControllerService) GetUserByEmail(ctx context.Context, req userModels.G
 	return s.usersService.GetUserByEmail(ctx, req)
 }
 
+// @Title Delete User
+// @Summary Delete user
+// @ID delete-user
+// @Produce json
+// @Param req body userModels.DeleteUserRequest true "delete user request"
+// @Success 200 {object} userModels.DeleteUserResponse
+// @Router /api/v1/user [delete]
 func (s *ControllerService) DeleteUser(ctx context.Context, req userModels.DeleteUserRequest) *userModels.DeleteUserResponse {
 	return s.usersService.DeleteUser(ctx, req)
 }
