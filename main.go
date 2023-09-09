@@ -7,6 +7,7 @@ import (
 	"github.com/Bruary/staff-scheduling/auth"
 	"github.com/Bruary/staff-scheduling/core"
 	"github.com/Bruary/staff-scheduling/db"
+	usersRepo "github.com/Bruary/staff-scheduling/db/users"
 	_ "github.com/Bruary/staff-scheduling/docs"
 	"github.com/Bruary/staff-scheduling/models"
 	"github.com/Bruary/staff-scheduling/users"
@@ -26,11 +27,11 @@ func main() {
 	// Establish DB connection
 	dbConn := db.EstablishDBConnection()
 
-	// New db service
-	database := db.New(dbConn)
+	// New db services
+	usersRepo := usersRepo.New(dbConn)
 
 	// services registry
-	usersService := users.New(database)
+	usersService := users.New(usersRepo)
 	authService := auth.New(usersService)
 
 	// controllers
@@ -116,6 +117,24 @@ func main() {
 	})
 
 	v1.Post("/login", func(c *fiber.Ctx) error {
+		req := auth.LoginRequest{}
+
+		err := json.Unmarshal(c.Body(), &req)
+		if err != nil {
+			return err
+		}
+
+		response := authController.Login(c.Context(), req)
+		respBytes, err := json.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		c.Context().SetBody(respBytes)
+		return nil
+	})
+
+	v1.Post("/schedule", func(c *fiber.Ctx) error {
 		req := auth.LoginRequest{}
 
 		err := json.Unmarshal(c.Body(), &req)

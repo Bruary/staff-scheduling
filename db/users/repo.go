@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"database/sql"
 
 	sqlc "github.com/Bruary/staff-scheduling/db/sqlc"
 )
@@ -15,6 +16,12 @@ type UsersRepoInterface interface {
 
 type UsersRepo struct {
 	provider *sqlc.Queries
+}
+
+func New(usersRepo *sql.DB) UsersRepoInterface {
+	return &UsersRepo{
+		provider: sqlc.New(usersRepo),
+	}
 }
 
 var _ UsersRepoInterface = &UsersRepo{}
