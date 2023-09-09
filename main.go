@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/Bruary/staff-scheduling/auth"
@@ -49,9 +48,6 @@ func main() {
 	v1.Use(func(c *fiber.Ctx) error {
 
 		c.Context().SetContentType("application/json")
-
-		fmt.Println("the path: ", string(c.Request().URI().Path()))
-		fmt.Println("the method: ", string(c.Request().Header.Method()))
 
 		endpointConfig, ok := core.Endpoints[core.Endpoint{Path: string(c.Request().URI().Path()), Method: string(c.Request().Header.Method())}]
 		if !ok {

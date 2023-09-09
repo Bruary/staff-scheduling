@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/user": {
+        "/api/v1/user": {
             "post": {
                 "produces": [
                     "application/json"

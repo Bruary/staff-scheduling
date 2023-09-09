@@ -30,7 +30,7 @@ func NewControllerService(usersService ServiceInterface) *ControllerService {
 // @Produce json
 // @Param req body userModels.CreateUserRequest true "create user request"
 // @Success 200 {object} userModels.CreateUserResponse
-// @Router /user [post]
+// @Router /api/v1/user [post]
 func (s *ControllerService) CreateUser(ctx context.Context, req userModels.CreateUserRequest) *userModels.CreateUserResponse {
 	return s.usersService.CreateUser(ctx, req)
 }

@@ -10,9 +10,13 @@ import (
 	"github.com/Bruary/staff-scheduling/models"
 	userModels "github.com/Bruary/staff-scheduling/users/models"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
-var UidForTests string = "1426ec8a-b7bb-47a8-bbba-ab5553b90c70"
+var (
+	UidForTests      string = "1426ec8a-b7bb-47a8-bbba-ab5553b90c70"
+	PasswordForTests string = "helloWorld"
+)
 
 type ServiceInterface interface {
 	CreateUser(context.Context, userModels.CreateUserRequest) *userModels.CreateUserResponse
@@ -90,16 +94,29 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 		}
 	}
 
+	// hash password
+	hashedPassword, err := HashPassword(req.Password)
+	if err != nil {
+		return &userModels.CreateUserResponse{
+			BaseResponse: &models.BaseResponse{
+				ErrorType: "Password hashing failed",
+				ErrorMsg:  err.Error(),
+			},
+		}
+	}
+
 	params := sqlc.CreateUserParams{
 		Uid:       uuid.NewString(),
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 		Email:     req.Email,
-		Password:  req.Password,
+		Password:  hashedPassword,
 	}
 
+	// to unify the uid/password used for testing
 	if os.Getenv("environment") == "testing" {
 		params.Uid = UidForTests
+		params.Password = PasswordForTests
 	}
 
 	user, err := s.UserRepo.CreateUser(ctx, params)
@@ -234,4 +251,14 @@ func (s *Service) GetUserByUID(ctx context.Context, userUID string) *userModels.
 
 func (s *Service) DeleteUser(ctx context.Context, req userModels.DeleteUserRequest) *userModels.DeleteUserResponse {
 	return nil
+}
+
+func HashPassword(plainPassword string) (hashedPassword string, err error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(plainPassword string, hashedPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
+	return err == nil
 }
