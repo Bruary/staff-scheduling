@@ -9,8 +9,8 @@ type User struct {
 	Created   string `json:"created,omitempty"`
 	Type      string `json:"type,omitempty"`
 	Uid       string `json:"uid,omitempty"`
-	FirstName string `json:"firstName,omitempty"`
-	LastName  string `json:"lastName,omitempty"`
+	FirstName string `json:"first_name,omitempty"`
+	LastName  string `json:"last_name,omitempty"`
 	Email     string `json:"email,omitempty"`
 	Password  string `json:"password,omitempty"`
 	Updated   string `json:"updated,omitempty"`
@@ -18,14 +18,14 @@ type User struct {
 }
 
 type CreateUserRequest struct {
-	FirstName string `json:"firstName,omitempty"`
-	LastName  string `json:"lastName,omitempty"`
+	FirstName string `json:"first_name,omitempty"`
+	LastName  string `json:"last_name,omitempty"`
 	Email     string `json:"email,omitempty"`
 	Password  string `json:"password,omitempty"`
 }
 
 type CreateUserResponse struct {
-	BaseResponse *models.BaseResponse `json:"baseResponse,omitempty"`
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
 	User         User                 `json:"user,omitempty"`
 }
 
@@ -34,7 +34,7 @@ type GetUserByEmailRequest struct {
 }
 
 type GetUserResponse struct {
-	BaseResponse *models.BaseResponse `json:"baseResponse,omitempty"`
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
 	User         User                 `json:"user,omitempty"`
 }
 
@@ -44,6 +44,16 @@ type DeleteUserRequest struct {
 }
 
 type DeleteUserResponse struct {
-	BaseResponse *models.BaseResponse `json:"baseResponse,omitempty"`
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
+	User         User                 `json:"user,omitempty"`
+}
+
+type UpdateUserPermissionLevelRequest struct {
+	Email           string                 `json:"email"`
+	PermissionLevel models.PermissionLevel `json:"permission_level"`
+}
+
+type UpdateUserPermissionLevelResponse struct {
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
 	User         User                 `json:"user,omitempty"`
 }

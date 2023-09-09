@@ -86,6 +86,30 @@ func (_m *UsersRepoInterface) GetUserByUid(ctx context.Context, uid string) (db.
 	return r0, r1
 }
 
+// UpdateUserPermissionLevel provides a mock function with given fields: ctx, params
+func (_m *UsersRepoInterface) UpdateUserPermissionLevel(ctx context.Context, params db.UpdateUserPermissionLevelParams) (db.User, error) {
+	ret := _m.Called(ctx, params)
+
+	var r0 db.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.UpdateUserPermissionLevelParams) (db.User, error)); ok {
+		return rf(ctx, params)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.UpdateUserPermissionLevelParams) db.User); ok {
+		r0 = rf(ctx, params)
+	} else {
+		r0 = ret.Get(0).(db.User)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.UpdateUserPermissionLevelParams) error); ok {
+		r1 = rf(ctx, params)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewUsersRepoInterface creates a new instance of UsersRepoInterface. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewUsersRepoInterface(t interface {

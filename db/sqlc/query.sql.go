@@ -129,3 +129,30 @@ func (q *Queries) GetUserByUid(ctx context.Context, uid string) (User, error) {
 	)
 	return i, err
 }
+
+const updateUserPermissionLevel = `-- name: UpdateUserPermissionLevel :one
+UPDATE users SET type=$1 WHERE email=$2 RETURNING id, created, uid, type, first_name, last_name, email, password, updated, deleted
+`
+
+type UpdateUserPermissionLevelParams struct {
+	Type  string
+	Email string
+}
+
+func (q *Queries) UpdateUserPermissionLevel(ctx context.Context, arg UpdateUserPermissionLevelParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserPermissionLevel, arg.Type, arg.Email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Created,
+		&i.Uid,
+		&i.Type,
+		&i.FirstName,
+		&i.LastName,
+		&i.Email,
+		&i.Password,
+		&i.Updated,
+		&i.Deleted,
+	)
+	return i, err
+}

@@ -17,3 +17,6 @@ Select * from users where email = $1;
 
 -- name: GetUserByUid :one
 Select * from users where uid = $1;
+
+-- name: UpdateUserPermissionLevel :one
+UPDATE users SET type=$1 WHERE email=$2 RETURNING *;

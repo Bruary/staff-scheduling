@@ -1,6 +1,8 @@
 package auth
 
-import "github.com/Bruary/staff-scheduling/models"
+import (
+	"github.com/Bruary/staff-scheduling/models"
+)
 
 type LoginRequest struct {
 	Email    string `json:"email,omitempty"`
@@ -8,18 +10,18 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	BaseResponse *models.BaseResponse `json:"baseResponse,omitempty"`
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
 	Token        string               `json:"token,omitempty"`
 }
 
 type TokenType string
 
 type CreateTokenRequest struct {
-	Email string `json:"email,omitempty"`
+	UserUid string `json:"user_uid,omitempty"`
 }
 
 type CreateTokenResponse struct {
-	BaseResponse *models.BaseResponse `json:"baseResponse,omitempty"`
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
 	Token        string               `json:"token,omitempty"`
 }
 
@@ -28,6 +30,7 @@ type IsTokenValidRequest struct {
 }
 
 type IsTokenValidResponse struct {
-	BaseResponse *models.BaseResponse `json:"baseResponse,omitempty"`
-	Valid        bool                 `json:"Valid,omitempty"`
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
+	Valid        bool                 `json:"valid,omitempty"`
+	Claims       *JWTClaims           `json:"claims,omitempty"`
 }

@@ -70,10 +70,7 @@ func main() {
 		}
 
 		if c.Get("Authorization") == "" {
-			errResp := models.BaseResponse{
-				ErrorType: "Token Missing",
-				ErrorMsg:  "Token is missing",
-			}
+			errResp := models.JWTMissingError
 			resp, _ := json.Marshal(errResp)
 			c.Context().SetBody(resp)
 			return nil
@@ -89,6 +86,23 @@ func main() {
 		}
 
 		if resp.Valid {
+			// fetch user
+			user, err := usersRepo.GetUserByUid(c.Context(), resp.Claims.UserUid)
+			if err != nil {
+				errResp := models.UnauthorizedError
+				resp, _ := json.Marshal(errResp)
+				c.Context().SetBody(resp)
+				return nil
+			}
+
+			// check if user have right access level
+			if user.Type != string(endpointConfig.AccessLevel) {
+				errResp := models.UserPermissionError
+				resp, _ := json.Marshal(errResp)
+				c.Context().SetBody(resp)
+				return nil
+			}
+
 			c.Next()
 			return nil
 		} else {
@@ -125,6 +139,24 @@ func main() {
 		}
 
 		response := authController.Login(c.Context(), req)
+		respBytes, err := json.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		c.Context().SetBody(respBytes)
+		return nil
+	})
+
+	v1.Put("/user/permission", func(c *fiber.Ctx) error {
+		req := userModels.UpdateUserPermissionLevelRequest{}
+
+		err := json.Unmarshal(c.Body(), &req)
+		if err != nil {
+			return err
+		}
+
+		response := usersController.UpdateUserPermissionLevel(c.Context(), req)
 		respBytes, err := json.Marshal(response)
 		if err != nil {
 			return err

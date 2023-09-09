@@ -30,7 +30,7 @@ func New(usersService users.ServiceInterface) *Service {
 
 type JWTClaims struct {
 	jwt.RegisteredClaims
-	UserEmail string
+	UserUid string
 }
 
 var key = []byte("helloWorld")
@@ -91,7 +91,7 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 
 	// generate JWT token
 	resp := s.CreateToken(ctx, CreateTokenRequest{
-		Email: req.Email,
+		UserUid: user.User.Uid,
 	})
 	if resp.BaseResponse != nil {
 		return &LoginResponse{
@@ -109,7 +109,7 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 
 func (s *Service) CreateToken(ctx context.Context, req CreateTokenRequest) *CreateTokenResponse {
 
-	token, err := generateJWTToken(req.Email)
+	token, err := generateJWTToken(req.UserUid)
 	if err != nil {
 		return &CreateTokenResponse{
 			BaseResponse: &models.BaseResponse{
@@ -140,11 +140,12 @@ func (s *Service) IsTokenValid(ctx context.Context, req IsTokenValidRequest) *Is
 	}
 
 	return &IsTokenValidResponse{
-		Valid: token.Valid,
+		Valid:  token.Valid,
+		Claims: claims,
 	}
 }
 
-func generateJWTToken(email string) (string, error) {
+func generateJWTToken(uid string) (string, error) {
 
 	claims := &JWTClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -152,7 +153,7 @@ func generateJWTToken(email string) (string, error) {
 				Time: time.Now().Add(time.Minute * 5),
 			},
 		},
-		UserEmail: email,
+		UserUid: uid,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)

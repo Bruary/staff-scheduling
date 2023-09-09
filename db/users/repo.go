@@ -12,6 +12,7 @@ type UsersRepoInterface interface {
 	CreateUser(ctx context.Context, params sqlc.CreateUserParams) (sqlc.User, error)
 	GetUserByEmail(ctx context.Context, email string) (sqlc.User, error)
 	GetUserByUid(ctx context.Context, uid string) (sqlc.User, error)
+	UpdateUserPermissionLevel(ctx context.Context, params sqlc.UpdateUserPermissionLevelParams) (sqlc.User, error)
 }
 
 type UsersRepo struct {
@@ -36,4 +37,8 @@ func (s *UsersRepo) GetUserByEmail(ctx context.Context, email string) (sqlc.User
 
 func (s *UsersRepo) GetUserByUid(ctx context.Context, uid string) (sqlc.User, error) {
 	return s.provider.GetUserByUid(ctx, uid)
+}
+
+func (s *UsersRepo) UpdateUserPermissionLevel(ctx context.Context, params sqlc.UpdateUserPermissionLevelParams) (sqlc.User, error) {
+	return s.provider.UpdateUserPermissionLevel(ctx, params)
 }

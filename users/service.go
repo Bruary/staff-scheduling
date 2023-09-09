@@ -23,6 +23,7 @@ type ServiceInterface interface {
 	GetUserByEmail(context.Context, userModels.GetUserByEmailRequest) *userModels.GetUserResponse
 	GetUserByUID(ctx context.Context, userUID string) *userModels.GetUserResponse
 	DeleteUser(context.Context, userModels.DeleteUserRequest) *userModels.DeleteUserResponse
+	UpdateUserPermissionLevel(context.Context, userModels.UpdateUserPermissionLevelRequest) *userModels.UpdateUserPermissionLevelResponse
 }
 
 type Service struct {
@@ -251,6 +252,68 @@ func (s *Service) GetUserByUID(ctx context.Context, userUID string) *userModels.
 
 func (s *Service) DeleteUser(ctx context.Context, req userModels.DeleteUserRequest) *userModels.DeleteUserResponse {
 	return nil
+}
+
+func (s *Service) UpdateUserPermissionLevel(ctx context.Context, req userModels.UpdateUserPermissionLevelRequest) *userModels.UpdateUserPermissionLevelResponse {
+	// validate payload
+	if req.Email == "" {
+		return &userModels.UpdateUserPermissionLevelResponse{
+			BaseResponse: &models.MissingParamError,
+		}
+	}
+
+	if req.PermissionLevel == "" {
+		return &userModels.UpdateUserPermissionLevelResponse{
+			BaseResponse: &models.MissingParamError,
+		}
+	}
+
+	// check if user exists
+	_, err := s.UserRepo.GetUserByEmail(ctx, req.Email)
+	if err != nil && err == sql.ErrNoRows {
+		return &userModels.UpdateUserPermissionLevelResponse{
+			BaseResponse: &models.UserDoesNotExistError,
+		}
+	} else if err != nil {
+		return &userModels.UpdateUserPermissionLevelResponse{
+			BaseResponse: &models.BaseResponse{
+				ErrorType:  models.UnknownError.ErrorType,
+				ErrorMsg:   models.UnknownError.ErrorMsg,
+				ErrorStack: append(models.UnknownError.ErrorStack, err.Error()),
+			},
+		}
+	}
+
+	params := sqlc.UpdateUserPermissionLevelParams{
+		Type:  string(req.PermissionLevel),
+		Email: req.Email,
+	}
+
+	// update user permission
+	user, err := s.UserRepo.UpdateUserPermissionLevel(ctx, params)
+	if err != nil {
+		return &userModels.UpdateUserPermissionLevelResponse{
+			BaseResponse: &models.BaseResponse{
+				ErrorType:  models.UnknownError.ErrorType,
+				ErrorMsg:   models.UnknownError.ErrorMsg,
+				ErrorStack: append(models.UnknownError.ErrorStack, err.Error()),
+			},
+		}
+	}
+
+	return &userModels.UpdateUserPermissionLevelResponse{
+		User: userModels.User{
+			Id:        user.ID,
+			Created:   user.Created.String(),
+			Type:      user.Type,
+			Uid:       user.Uid,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+			Password:  user.Password,
+			Updated:   user.Updated.String(),
+		},
+	}
 }
 
 func HashPassword(plainPassword string) (hashedPassword string, err error) {
