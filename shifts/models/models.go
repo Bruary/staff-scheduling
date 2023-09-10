@@ -26,3 +26,12 @@ type CreateShiftResponse struct {
 	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
 	Schedule     *Shift               `json:"schedule,omitempty"`
 }
+
+type DeleteShiftRequest struct {
+	ShiftUid string `json:"shift_uid"`
+}
+
+type DeleteShiftResponse struct {
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
+	Shift        *Shift               `json:"shift,omitempty"`
+}

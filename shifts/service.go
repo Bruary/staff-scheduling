@@ -17,6 +17,7 @@ import (
 
 type ServiceInterface interface {
 	CreateShift(ctx context.Context, req shiftsModels.CreateShiftRequest) *shiftsModels.CreateShiftResponse
+	DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftRequest) *shiftsModels.DeleteShiftResponse
 }
 
 type Service struct {
@@ -158,6 +159,44 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 			WorkDate:           shift.WorkDate,
 			ShiftLenghtInHours: float32(shift.ShiftLengthHours),
 			UserId:             int(shift.UserID),
+		},
+	}
+}
+
+func (s *Service) DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftRequest) *shiftsModels.DeleteShiftResponse {
+
+	// validate
+	if req.ShiftUid == "" {
+		return &shiftsModels.DeleteShiftResponse{
+			BaseResponse: &coreModels.BaseResponse{
+				ErrorType:  coreModels.MissingParamError.ErrorType,
+				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.DeleteShift: shift uid is missing"),
+			},
+		}
+	}
+
+	shift, err := s.shiftsRepo.DeleteShift(ctx, req.ShiftUid)
+	if err != nil {
+		return &shiftsModels.DeleteShiftResponse{
+			BaseResponse: &coreModels.BaseResponse{
+				ErrorType:  coreModels.UnknownError.ErrorType,
+				ErrorMsg:   coreModels.UnknownError.ErrorMsg,
+				ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.DeleteShift: failed to delete shift or its already deleted, shift_uid=%s, err=%s", req.ShiftUid, err.Error())),
+			},
+		}
+	}
+
+	return &shiftsModels.DeleteShiftResponse{
+		Shift: &shiftsModels.Shift{
+			Id:                 shift.ID,
+			Created:            shift.Created.String(),
+			Uid:                shift.Uid,
+			WorkDate:           shift.WorkDate,
+			ShiftLenghtInHours: float32(shift.ShiftLengthHours),
+			UserId:             int(shift.UserID),
+			Updated:            shift.Updated.Time.String(),
+			Deleted:            shift.Deleted.Time.String(),
 		},
 	}
 }

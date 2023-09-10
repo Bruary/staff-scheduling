@@ -22,5 +22,6 @@ var Endpoints = map[Endpoint]EndpointConfig{
 	{Path: "/api/v1/user/permission", Method: "PUT"}: {RequireJWT: true, AccessLevel: models.AdminPermissionLevel},
 
 	//shifts
-	{Path: "/api/v1/shift", Method: "POST"}: {RequireJWT: true, AccessLevel: models.AdminPermissionLevel},
+	{Path: "/api/v1/shift", Method: "POST"}:   {RequireJWT: true, AccessLevel: models.AdminPermissionLevel},
+	{Path: "/api/v1/shift", Method: "DELETE"}: {RequireJWT: true, AccessLevel: models.AdminPermissionLevel},
 }

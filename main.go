@@ -208,5 +208,23 @@ func main() {
 		return nil
 	})
 
+	v1.Delete("/shift", func(c *fiber.Ctx) error {
+		req := shiftsModels.DeleteShiftRequest{}
+
+		err := json.Unmarshal(c.Body(), &req)
+		if err != nil {
+			return err
+		}
+
+		response := shiftsController.DeleteShift(c.Context(), req)
+		respBytes, err := json.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		c.Context().SetBody(respBytes)
+		return nil
+	})
+
 	app.Listen(":3000")
 }

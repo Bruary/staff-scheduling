@@ -25,7 +25,7 @@ CREATE TABLE "shifts" (
 -- Add foriegn keys
 ALTER TABLE "shifts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
--- create function to automatically update "updated" column when UPDATE command is ran
+-- create function to automatically update "updated" column in "users" table when UPDATE command is ran
 CREATE  FUNCTION update_updated_column_on_users()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -41,3 +41,20 @@ CREATE TRIGGER update_updated_column_on_users
         users
     FOR EACH ROW
 EXECUTE PROCEDURE update_updated_column_on_users();
+
+-- create function to automatically update "updated" column in "shifts" table when UPDATE command is ran
+CREATE  FUNCTION update_updated_column_on_shifts()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- trigger to update "updated" column on shifts
+CREATE TRIGGER update_updated_column_on_shifts
+    BEFORE UPDATE
+    ON
+        shifts
+    FOR EACH ROW
+EXECUTE PROCEDURE update_updated_column_on_shifts();

@@ -86,6 +86,26 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const deleteShift = `-- name: DeleteShift :one
+UPDATE shifts SET deleted = now() WHERE uid = $1 and deleted IS NULL RETURNING id, created, uid, work_date, shift_length_hours, user_id, updated, deleted
+`
+
+func (q *Queries) DeleteShift(ctx context.Context, uid string) (Shift, error) {
+	row := q.db.QueryRowContext(ctx, deleteShift, uid)
+	var i Shift
+	err := row.Scan(
+		&i.ID,
+		&i.Created,
+		&i.Uid,
+		&i.WorkDate,
+		&i.ShiftLengthHours,
+		&i.UserID,
+		&i.Updated,
+		&i.Deleted,
+	)
+	return i, err
+}
+
 const deleteUser = `-- name: DeleteUser :one
 UPDATE users SET deleted = now() WHERE email = $1 RETURNING id, created, uid, type, first_name, last_name, email, password, updated, deleted
 `
@@ -153,7 +173,7 @@ func (q *Queries) GetUserByUid(ctx context.Context, uid string) (User, error) {
 }
 
 const getUserShifts = `-- name: GetUserShifts :many
-SELECT id, created, uid, work_date, shift_length_hours, user_id, updated, deleted FROM shifts WHERE user_id = (SELECT id FROM users WHERE email = $1)
+SELECT id, created, uid, work_date, shift_length_hours, user_id, updated, deleted FROM shifts WHERE user_id = (SELECT id FROM users WHERE email = $1) AND deleted IS NULL
 `
 
 func (q *Queries) GetUserShifts(ctx context.Context, email string) ([]Shift, error) {

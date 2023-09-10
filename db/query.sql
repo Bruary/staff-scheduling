@@ -25,4 +25,7 @@ INSERT INTO shifts (
     ) RETURNING *;
 
 -- name: GetUserShifts :many
-SELECT * FROM shifts WHERE user_id = (SELECT id FROM users WHERE email = $1);
+SELECT * FROM shifts WHERE user_id = (SELECT id FROM users WHERE email = $1) AND deleted IS NULL;
+
+-- name: DeleteShift :one
+UPDATE shifts SET deleted = now() WHERE uid = $1 and deleted IS NULL RETURNING *;

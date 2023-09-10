@@ -11,6 +11,7 @@ import (
 type ShiftsRepoInterface interface {
 	CreateShift(ctx context.Context, params sqlc.CreateShiftParams) (sqlc.Shift, error)
 	GetUserShifts(ctx context.Context, email string) ([]sqlc.Shift, error)
+	DeleteShift(ctx context.Context, uid string) (sqlc.Shift, error)
 }
 
 type ShiftsRepo struct {
@@ -33,4 +34,8 @@ func (s *ShiftsRepo) CreateShift(ctx context.Context, params sqlc.CreateShiftPar
 
 func (s *ShiftsRepo) GetUserShifts(ctx context.Context, email string) ([]sqlc.Shift, error) {
 	return s.provider.GetUserShifts(ctx, email)
+}
+
+func (s *ShiftsRepo) DeleteShift(ctx context.Context, uid string) (sqlc.Shift, error) {
+	return s.provider.DeleteShift(ctx, uid)
 }
