@@ -10,6 +10,11 @@ type BaseResponse struct {
 type PermissionLevel string
 
 var (
-	Admin PermissionLevel = "admin"
-	Basic PermissionLevel = "basic"
+	AdminPermissionLevel PermissionLevel = "admin"
+	BasicPermissionLevel PermissionLevel = "basic"
+)
+
+// Date formats
+var (
+	YYYYMMDD_format = "2006-01-02"
 )

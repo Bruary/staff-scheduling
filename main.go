@@ -8,8 +8,11 @@ import (
 	"github.com/Bruary/staff-scheduling/core"
 	"github.com/Bruary/staff-scheduling/core/models"
 	"github.com/Bruary/staff-scheduling/db"
+	shiftsRepo "github.com/Bruary/staff-scheduling/db/shifts"
 	usersRepo "github.com/Bruary/staff-scheduling/db/users"
 	_ "github.com/Bruary/staff-scheduling/docs"
+	"github.com/Bruary/staff-scheduling/shifts"
+	shiftsModels "github.com/Bruary/staff-scheduling/shifts/models"
 	"github.com/Bruary/staff-scheduling/users"
 	userModels "github.com/Bruary/staff-scheduling/users/models"
 	"github.com/gofiber/fiber/v2"
@@ -29,14 +32,17 @@ func main() {
 
 	// New db services
 	usersRepo := usersRepo.New(dbConn)
+	shiftsRepo := shiftsRepo.New(dbConn)
 
 	// services registry
 	usersService := users.New(usersRepo)
 	authService := auth.New(usersService)
+	shiftsService := shifts.New(usersRepo, shiftsRepo)
 
 	// controllers
 	usersController := users.NewControllerService(usersService)
 	authController := auth.NewControllerService(authService)
+	shiftsController := shifts.NewControllerService(&shiftsService)
 
 	app := fiber.New()
 
@@ -184,15 +190,15 @@ func main() {
 		return nil
 	})
 
-	v1.Post("/schedule", func(c *fiber.Ctx) error {
-		req := auth.LoginRequest{}
+	v1.Post("/shift", func(c *fiber.Ctx) error {
+		req := shiftsModels.CreateShiftRequest{}
 
 		err := json.Unmarshal(c.Body(), &req)
 		if err != nil {
 			return err
 		}
 
-		response := authController.Login(c.Context(), req)
+		response := shiftsController.CreateShift(c.Context(), req)
 		respBytes, err := json.Marshal(response)
 		if err != nil {
 			return err

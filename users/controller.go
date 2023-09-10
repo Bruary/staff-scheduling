@@ -19,7 +19,7 @@ type ControllerService struct {
 
 var _ ControllerInterface = &ControllerService{}
 
-func NewControllerService(usersService ServiceInterface) *ControllerService {
+func NewControllerService(usersService ServiceInterface) ControllerInterface {
 	return &ControllerService{
 		usersService: usersService,
 	}

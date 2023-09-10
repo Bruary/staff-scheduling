@@ -40,7 +40,7 @@ func TestCreateUser(t *testing.T) {
 			resp: models.CreateUserResponse{
 				User: models.User{
 					Id:        1,
-					Type:      string(coreModels.Basic),
+					Type:      string(coreModels.BasicPermissionLevel),
 					Uid:       users.UidForTests,
 					FirstName: "Bakir",
 					LastName:  "Kais",
@@ -50,7 +50,7 @@ func TestCreateUser(t *testing.T) {
 			},
 			createUserResp: sqlc.User{
 				ID:        1,
-				Type:      string(coreModels.Basic),
+				Type:      string(coreModels.BasicPermissionLevel),
 				Uid:       users.UidForTests,
 				FirstName: "Bakir",
 				LastName:  "Kais",
@@ -59,7 +59,7 @@ func TestCreateUser(t *testing.T) {
 			},
 			getUserResp: sqlc.User{
 				ID:        1,
-				Type:      string(coreModels.Basic),
+				Type:      string(coreModels.BasicPermissionLevel),
 				Uid:       users.UidForTests,
 				FirstName: "Bakir",
 				LastName:  "Kais",
@@ -82,7 +82,7 @@ func TestCreateUser(t *testing.T) {
 				User: models.User{
 					Id:        1,
 					Created:   time.Now().String(),
-					Type:      string(coreModels.Basic),
+					Type:      string(coreModels.BasicPermissionLevel),
 					Uid:       users.UidForTests,
 					FirstName: "Bakir",
 					LastName:  "Kais",
@@ -93,7 +93,7 @@ func TestCreateUser(t *testing.T) {
 			},
 			createUserResp: sqlc.User{
 				ID:        1,
-				Type:      string(coreModels.Basic),
+				Type:      string(coreModels.BasicPermissionLevel),
 				Uid:       users.UidForTests,
 				FirstName: "Bakir",
 				LastName:  "Kais",

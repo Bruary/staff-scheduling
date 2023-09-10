@@ -152,6 +152,42 @@ func (q *Queries) GetUserByUid(ctx context.Context, uid string) (User, error) {
 	return i, err
 }
 
+const getUserShifts = `-- name: GetUserShifts :many
+SELECT id, created, uid, work_date, shift_length_hours, user_id, updated, deleted FROM shifts WHERE user_id = (SELECT id FROM users WHERE email = $1)
+`
+
+func (q *Queries) GetUserShifts(ctx context.Context, email string) ([]Shift, error) {
+	rows, err := q.db.QueryContext(ctx, getUserShifts, email)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Shift
+	for rows.Next() {
+		var i Shift
+		if err := rows.Scan(
+			&i.ID,
+			&i.Created,
+			&i.Uid,
+			&i.WorkDate,
+			&i.ShiftLengthHours,
+			&i.UserID,
+			&i.Updated,
+			&i.Deleted,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateUserPermissionLevel = `-- name: UpdateUserPermissionLevel :one
 UPDATE users SET type=$1 WHERE email=$2 RETURNING id, created, uid, type, first_name, last_name, email, password, updated, deleted
 `

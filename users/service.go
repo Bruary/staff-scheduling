@@ -308,6 +308,16 @@ func (s *Service) UpdateUserPermissionLevel(ctx context.Context, req userModels.
 		}
 	}
 
+	if req.PermissionLevel != models.AdminPermissionLevel && req.PermissionLevel != models.BasicPermissionLevel {
+		return &userModels.UpdateUserPermissionLevelResponse{
+			BaseResponse: &models.BaseResponse{
+				ErrorType:  models.InvalidParamError.ErrorType,
+				ErrorMsg:   models.InvalidParamError.ErrorMsg,
+				ErrorStack: append(models.InvalidParamError.ErrorStack, "permission level does not exist"),
+			},
+		}
+	}
+
 	// check if user exists
 	_, err := s.UserRepo.GetUserByEmail(ctx, req.Email)
 	if err != nil && err == sql.ErrNoRows {
