@@ -29,3 +29,15 @@ SELECT * FROM shifts WHERE user_id = (SELECT id FROM users WHERE email = $1) AND
 
 -- name: DeleteShift :one
 UPDATE shifts SET deleted = now() WHERE uid = $1 and deleted IS NULL RETURNING *;
+
+-- name: UpdateShiftUserId :one
+UPDATE shifts SET user_id = (SELECT id FROM users WHERE email = $1) WHERE shifts.uid = $2 AND deleted IS NULL RETURNING *;
+
+-- name: UpdateShiftWorkDate :one
+UPDATE shifts SET work_date = $1 WHERE uid = $2 AND deleted IS NULL RETURNING *;
+
+-- name: UpdateShiftLength :one
+UPDATE shifts SET shift_length_hours = $1 WHERE uid = $2 AND deleted IS NULL RETURNING *;
+
+-- name: GetShiftByUid :one
+SELECT * FROM shifts WHERE uid = $1 AND deleted IS NULL;

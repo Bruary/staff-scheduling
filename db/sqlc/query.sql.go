@@ -128,6 +128,26 @@ func (q *Queries) DeleteUser(ctx context.Context, email string) (User, error) {
 	return i, err
 }
 
+const getShiftByUid = `-- name: GetShiftByUid :one
+SELECT id, created, uid, work_date, shift_length_hours, user_id, updated, deleted FROM shifts WHERE uid = $1 AND deleted IS NULL
+`
+
+func (q *Queries) GetShiftByUid(ctx context.Context, uid string) (Shift, error) {
+	row := q.db.QueryRowContext(ctx, getShiftByUid, uid)
+	var i Shift
+	err := row.Scan(
+		&i.ID,
+		&i.Created,
+		&i.Uid,
+		&i.WorkDate,
+		&i.ShiftLengthHours,
+		&i.UserID,
+		&i.Updated,
+		&i.Deleted,
+	)
+	return i, err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 Select id, created, uid, type, first_name, last_name, email, password, updated, deleted from users where email = $1
 `
@@ -206,6 +226,81 @@ func (q *Queries) GetUserShifts(ctx context.Context, email string) ([]Shift, err
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateShiftLength = `-- name: UpdateShiftLength :one
+UPDATE shifts SET shift_length_hours = $1 WHERE uid = $2 AND deleted IS NULL RETURNING id, created, uid, work_date, shift_length_hours, user_id, updated, deleted
+`
+
+type UpdateShiftLengthParams struct {
+	ShiftLengthHours float64
+	Uid              string
+}
+
+func (q *Queries) UpdateShiftLength(ctx context.Context, arg UpdateShiftLengthParams) (Shift, error) {
+	row := q.db.QueryRowContext(ctx, updateShiftLength, arg.ShiftLengthHours, arg.Uid)
+	var i Shift
+	err := row.Scan(
+		&i.ID,
+		&i.Created,
+		&i.Uid,
+		&i.WorkDate,
+		&i.ShiftLengthHours,
+		&i.UserID,
+		&i.Updated,
+		&i.Deleted,
+	)
+	return i, err
+}
+
+const updateShiftUserId = `-- name: UpdateShiftUserId :one
+UPDATE shifts SET user_id = (SELECT id FROM users WHERE email = $1) WHERE shifts.uid = $2 AND deleted IS NULL RETURNING id, created, uid, work_date, shift_length_hours, user_id, updated, deleted
+`
+
+type UpdateShiftUserIdParams struct {
+	Email string
+	Uid   string
+}
+
+func (q *Queries) UpdateShiftUserId(ctx context.Context, arg UpdateShiftUserIdParams) (Shift, error) {
+	row := q.db.QueryRowContext(ctx, updateShiftUserId, arg.Email, arg.Uid)
+	var i Shift
+	err := row.Scan(
+		&i.ID,
+		&i.Created,
+		&i.Uid,
+		&i.WorkDate,
+		&i.ShiftLengthHours,
+		&i.UserID,
+		&i.Updated,
+		&i.Deleted,
+	)
+	return i, err
+}
+
+const updateShiftWorkDate = `-- name: UpdateShiftWorkDate :one
+UPDATE shifts SET work_date = $1 WHERE uid = $2 AND deleted IS NULL RETURNING id, created, uid, work_date, shift_length_hours, user_id, updated, deleted
+`
+
+type UpdateShiftWorkDateParams struct {
+	WorkDate time.Time
+	Uid      string
+}
+
+func (q *Queries) UpdateShiftWorkDate(ctx context.Context, arg UpdateShiftWorkDateParams) (Shift, error) {
+	row := q.db.QueryRowContext(ctx, updateShiftWorkDate, arg.WorkDate, arg.Uid)
+	var i Shift
+	err := row.Scan(
+		&i.ID,
+		&i.Created,
+		&i.Uid,
+		&i.WorkDate,
+		&i.ShiftLengthHours,
+		&i.UserID,
+		&i.Updated,
+		&i.Deleted,
+	)
+	return i, err
 }
 
 const updateUserPermissionLevel = `-- name: UpdateUserPermissionLevel :one

@@ -26,6 +26,22 @@ definitions:
       success:
         type: boolean
     type: object
+  models.CreateShiftRequest:
+    properties:
+      shift_length_in_hours:
+        type: number
+      user_email:
+        type: string
+      work_date:
+        type: string
+    type: object
+  models.CreateShiftResponse:
+    properties:
+      base_response:
+        $ref: '#/definitions/models.BaseResponse'
+      schedule:
+        $ref: '#/definitions/models.Shift'
+    type: object
   models.CreateUserRequest:
     properties:
       email:
@@ -44,6 +60,18 @@ definitions:
       user:
         $ref: '#/definitions/models.User'
     type: object
+  models.DeleteShiftRequest:
+    properties:
+      shift_uid:
+        type: string
+    type: object
+  models.DeleteShiftResponse:
+    properties:
+      base_response:
+        $ref: '#/definitions/models.BaseResponse'
+      shift:
+        $ref: '#/definitions/models.Shift'
+    type: object
   models.DeleteUserRequest:
     properties:
       email:
@@ -55,6 +83,43 @@ definitions:
         $ref: '#/definitions/models.BaseResponse'
       user:
         $ref: '#/definitions/models.User'
+    type: object
+  models.Shift:
+    properties:
+      created:
+        type: string
+      deleted:
+        type: string
+      id:
+        type: integer
+      shift_length_in_hours:
+        type: number
+      uid:
+        type: string
+      updated:
+        type: string
+      user_id:
+        type: integer
+      work_date:
+        type: string
+    type: object
+  models.UpdateShiftRequest:
+    properties:
+      assigned_user_email:
+        type: string
+      shift_length_in_hours:
+        type: number
+      shift_uid:
+        type: string
+      work_date:
+        type: string
+    type: object
+  models.UpdateShiftResponse:
+    properties:
+      base_response:
+        $ref: '#/definitions/models.BaseResponse'
+      shift:
+        $ref: '#/definitions/models.Shift'
     type: object
   models.UpdateUserPermissionLevelRequest:
     properties:
@@ -114,6 +179,58 @@ paths:
           schema:
             $ref: '#/definitions/auth.LoginResponse'
       summary: Login
+  /api/v1/shift:
+    delete:
+      operationId: delete-shift
+      parameters:
+      - description: delete shift request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteShiftRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DeleteShiftResponse'
+      summary: Delete shift
+    patch:
+      operationId: update-shift
+      parameters:
+      - description: update shift request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateShiftRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UpdateShiftResponse'
+      summary: Update shift
+    post:
+      operationId: create-new-shift
+      parameters:
+      - description: create shift request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateShiftRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CreateShiftResponse'
+      summary: Create new shift
   /api/v1/signup:
     post:
       operationId: create-a-new-user

@@ -10,8 +10,9 @@ var (
 	// User
 	UserDoesNotExistError = BaseResponse{Success: false, ErrorType: "DOES_NOT_EXIST", ErrorMsg: "User does not exist", ErrorStack: []string{}}
 
-	// Schedules
-	ScheduleAlreadyExistError = BaseResponse{Success: false, ErrorType: "SCHEDULE_ALREADY_EXIST", ErrorMsg: "User already have a schedule booked for this day", ErrorStack: []string{}}
+	// Shifts
+	ShiftAlreadyExistError = BaseResponse{Success: false, ErrorType: "SHIFT_ALREADY_EXIST", ErrorMsg: "User already have a shift booked for this day", ErrorStack: []string{}}
+	ShiftNotFoundError     = BaseResponse{Success: false, ErrorType: "SHIFT_DOES_NOT_EXIST", ErrorMsg: "Shift does not exist", ErrorStack: []string{}}
 
 	// Core
 	UnknownError        = BaseResponse{Success: false, ErrorType: "UNKNOWN_ERROR", ErrorMsg: "Unknown error occured", ErrorStack: []string{}}

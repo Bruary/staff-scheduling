@@ -12,6 +12,10 @@ type ShiftsRepoInterface interface {
 	CreateShift(ctx context.Context, params sqlc.CreateShiftParams) (sqlc.Shift, error)
 	GetUserShifts(ctx context.Context, email string) ([]sqlc.Shift, error)
 	DeleteShift(ctx context.Context, uid string) (sqlc.Shift, error)
+	UpdateShiftUserId(ctx context.Context, params sqlc.UpdateShiftUserIdParams) (sqlc.Shift, error)
+	UpdateShiftWorkDate(ctx context.Context, params sqlc.UpdateShiftWorkDateParams) (sqlc.Shift, error)
+	UpdateShiftLength(ctx context.Context, params sqlc.UpdateShiftLengthParams) (sqlc.Shift, error)
+	GetShiftByUid(ctx context.Context, uid string) (sqlc.Shift, error)
 }
 
 type ShiftsRepo struct {
@@ -38,4 +42,20 @@ func (s *ShiftsRepo) GetUserShifts(ctx context.Context, email string) ([]sqlc.Sh
 
 func (s *ShiftsRepo) DeleteShift(ctx context.Context, uid string) (sqlc.Shift, error) {
 	return s.provider.DeleteShift(ctx, uid)
+}
+
+func (s *ShiftsRepo) UpdateShiftUserId(ctx context.Context, params sqlc.UpdateShiftUserIdParams) (sqlc.Shift, error) {
+	return s.provider.UpdateShiftUserId(ctx, params)
+}
+
+func (s *ShiftsRepo) UpdateShiftWorkDate(ctx context.Context, params sqlc.UpdateShiftWorkDateParams) (sqlc.Shift, error) {
+	return s.provider.UpdateShiftWorkDate(ctx, params)
+}
+
+func (s *ShiftsRepo) UpdateShiftLength(ctx context.Context, params sqlc.UpdateShiftLengthParams) (sqlc.Shift, error) {
+	return s.provider.UpdateShiftLength(ctx, params)
+}
+
+func (s *ShiftsRepo) GetShiftByUid(ctx context.Context, uid string) (sqlc.Shift, error) {
+	return s.provider.GetShiftByUid(ctx, uid)
 }

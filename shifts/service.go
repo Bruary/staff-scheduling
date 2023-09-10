@@ -18,6 +18,7 @@ import (
 type ServiceInterface interface {
 	CreateShift(ctx context.Context, req shiftsModels.CreateShiftRequest) *shiftsModels.CreateShiftResponse
 	DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftRequest) *shiftsModels.DeleteShiftResponse
+	UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftRequest) *shiftsModels.UpdateShiftResponse
 }
 
 type Service struct {
@@ -124,8 +125,8 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 		if doesUserHaveShiftAlready {
 			return &shiftsModels.CreateShiftResponse{
 				BaseResponse: &coreModels.BaseResponse{
-					ErrorType:  coreModels.ScheduleAlreadyExistError.ErrorType,
-					ErrorMsg:   coreModels.ScheduleAlreadyExistError.ErrorMsg,
+					ErrorType:  coreModels.ShiftAlreadyExistError.ErrorType,
+					ErrorMsg:   coreModels.ShiftAlreadyExistError.ErrorMsg,
 					ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.CreateSchedule: shift already exist on %s for user_id=%v", shift.WorkDate, shift.UserID)),
 				},
 			}
@@ -197,6 +198,161 @@ func (s *Service) DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftR
 			UserId:             int(shift.UserID),
 			Updated:            shift.Updated.Time.String(),
 			Deleted:            shift.Deleted.Time.String(),
+		},
+	}
+}
+
+func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftRequest) *shiftsModels.UpdateShiftResponse {
+
+	var (
+		updatedShift sqlc.Shift
+	)
+
+	// validate
+	if req.ShiftUid == "" {
+		return &shiftsModels.UpdateShiftResponse{
+			BaseResponse: &coreModels.BaseResponse{
+				ErrorType:  coreModels.MissingParamError.ErrorType,
+				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.UpdateShift: missing shift_uid in the request"),
+			},
+		}
+	}
+
+	if req.AssignedUserEmail == "" && req.ShiftLenghtInHours == 0 && req.WorkDate == "" {
+		return &shiftsModels.UpdateShiftResponse{
+			BaseResponse: &coreModels.BaseResponse{
+				ErrorType:  coreModels.MissingParamError.ErrorType,
+				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.UpdateShift: atleast one of the following params are required: work_date, shift_length_in_hours, assigned_user_email"),
+			},
+		}
+	}
+
+	// check if shift exists
+	shift, err := s.shiftsRepo.GetShiftByUid(ctx, req.ShiftUid)
+	if err != nil {
+		return &shiftsModels.UpdateShiftResponse{
+			BaseResponse: &coreModels.BaseResponse{
+				ErrorType:  coreModels.ShiftNotFoundError.ErrorType,
+				ErrorMsg:   coreModels.ShiftNotFoundError.ErrorMsg,
+				ErrorStack: append(coreModels.ShiftNotFoundError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed to get shift, shift_uid=%s, err=%s", req.ShiftUid, err.Error())),
+			},
+		}
+	}
+
+	// if user email is passed, then:
+	// 1) check if new user exists
+	// 2) update shift with new user
+	if req.AssignedUserEmail != "" {
+		user, err := s.usersRepo.GetUserByEmail(ctx, req.AssignedUserEmail)
+		if err != nil {
+			return &shiftsModels.UpdateShiftResponse{
+				BaseResponse: &coreModels.BaseResponse{
+					ErrorType:  coreModels.UnknownError.ErrorType,
+					ErrorMsg:   coreModels.UnknownError.ErrorMsg,
+					ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed to get user, user_email=%s, err=%s", req.AssignedUserEmail, err.Error())),
+				},
+			}
+		}
+
+		// update
+		if shift.UserID != user.ID {
+			updatedShift, err = s.shiftsRepo.UpdateShiftUserId(ctx, sqlc.UpdateShiftUserIdParams{
+				Email: req.AssignedUserEmail,
+				Uid:   req.ShiftUid,
+			})
+			if err != nil {
+				return &shiftsModels.UpdateShiftResponse{
+					BaseResponse: &coreModels.BaseResponse{
+						ErrorType:  coreModels.UnknownError.ErrorType,
+						ErrorMsg:   coreModels.UnknownError.ErrorMsg,
+						ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed to update shift user id, shift_uid=%s, user_email=%s, err=%s", req.ShiftUid, req.AssignedUserEmail, err.Error())),
+					},
+				}
+			}
+
+			fmt.Printf("Service.UpdateShift: shift user_id have been updated, shift_uid=%s, old user_id=%v, new user_id=%v", req.ShiftUid, shift.UserID, user.ID)
+		}
+	}
+
+	// if work date is passed, then:
+	// 1) parse new date
+	// 2) update shift with new work date
+	if req.WorkDate != "" {
+		newWorkDate, err := time.Parse(coreModels.YYYYMMDD_format, req.WorkDate)
+		if err != nil {
+			return &shiftsModels.UpdateShiftResponse{
+				BaseResponse: &coreModels.BaseResponse{
+					ErrorType:  coreModels.UnknownError.ErrorType,
+					ErrorMsg:   coreModels.UnknownError.ErrorMsg,
+					ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed to parse new work date, correct date format:%s shift_uid=%s, work_date=%s, err=%s", coreModels.YYYYMMDD_format, req.ShiftUid, req.WorkDate, err.Error())),
+				},
+			}
+		}
+
+		if !shift.WorkDate.Equal(newWorkDate) {
+			updatedShift, err = s.shiftsRepo.UpdateShiftWorkDate(ctx, sqlc.UpdateShiftWorkDateParams{
+				WorkDate: newWorkDate,
+				Uid:      req.ShiftUid,
+			})
+			if err != nil {
+				return &shiftsModels.UpdateShiftResponse{
+					BaseResponse: &coreModels.BaseResponse{
+						ErrorType:  coreModels.UnknownError.ErrorType,
+						ErrorMsg:   coreModels.UnknownError.ErrorMsg,
+						ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed update shift work date, shift_uid=%s, work_date=%s, err=%s", req.ShiftUid, req.WorkDate, err.Error())),
+					},
+				}
+			}
+
+			fmt.Printf("Service.UpdateShift: shift work_date have been updated, shift_uid=%s, old work_date=%s, new work_date=%s", req.ShiftUid, shift.WorkDate.String(), newWorkDate.String())
+		}
+	}
+
+	// if shift length is passed, then:
+	// 1) validate new shift length
+	// 2) update shift with new length
+	if req.ShiftLenghtInHours != 0 {
+
+		if req.ShiftLenghtInHours > 12 || req.ShiftLenghtInHours < 0.5 {
+			return &shiftsModels.UpdateShiftResponse{
+				BaseResponse: &coreModels.BaseResponse{
+					ErrorType:  coreModels.InvalidParamError.ErrorType,
+					ErrorMsg:   coreModels.InvalidParamError.ErrorMsg,
+					ErrorStack: append(coreModels.InvalidParamError.ErrorStack, "Service.UpdateShift: shift_length_in_hours can not be less than 0.5 hours or more than 12 hours"),
+				},
+			}
+		}
+
+		if req.ShiftLenghtInHours != float32(shift.ShiftLengthHours) {
+			updatedShift, err = s.shiftsRepo.UpdateShiftLength(ctx, sqlc.UpdateShiftLengthParams{
+				ShiftLengthHours: float64(req.ShiftLenghtInHours),
+				Uid:              req.ShiftUid,
+			})
+			if err != nil {
+				return &shiftsModels.UpdateShiftResponse{
+					BaseResponse: &coreModels.BaseResponse{
+						ErrorType:  coreModels.UnknownError.ErrorType,
+						ErrorMsg:   coreModels.UnknownError.ErrorMsg,
+						ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed update shift length, shift_uid=%s, shift_length_in_hours=%v, err=%s", req.ShiftUid, req.ShiftLenghtInHours, err.Error())),
+					},
+				}
+			}
+
+			fmt.Printf("Service.UpdateShift: shift shift_length_in_hours have been updated, shift_uid=%s, old shift_length_in_hours=%v, new shift_length_in_hours=%v", req.ShiftUid, shift.ShiftLengthHours, req.ShiftLenghtInHours)
+		}
+	}
+
+	return &shiftsModels.UpdateShiftResponse{
+		Shift: &shiftsModels.Shift{
+			Id:                 updatedShift.ID,
+			Created:            updatedShift.Created.String(),
+			Uid:                updatedShift.Uid,
+			WorkDate:           updatedShift.WorkDate,
+			ShiftLenghtInHours: float32(updatedShift.ShiftLengthHours),
+			UserId:             int(updatedShift.UserID),
+			Updated:            updatedShift.Updated.Time.String(),
 		},
 	}
 }

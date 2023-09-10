@@ -32,6 +32,86 @@
                 }
             }
         },
+        "/api/v1/shift": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new shift",
+                "operationId": "create-new-shift",
+                "parameters": [
+                    {
+                        "description": "create shift request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateShiftRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateShiftResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete shift",
+                "operationId": "delete-shift",
+                "parameters": [
+                    {
+                        "description": "delete shift request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteShiftRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteShiftResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update shift",
+                "operationId": "update-shift",
+                "parameters": [
+                    {
+                        "description": "update shift request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateShiftRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateShiftResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/signup": {
             "post": {
                 "produces": [
@@ -160,6 +240,31 @@
                 }
             }
         },
+        "models.CreateShiftRequest": {
+            "type": "object",
+            "properties": {
+                "shift_length_in_hours": {
+                    "type": "number"
+                },
+                "user_email": {
+                    "type": "string"
+                },
+                "work_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateShiftResponse": {
+            "type": "object",
+            "properties": {
+                "base_response": {
+                    "$ref": "#/definitions/models.BaseResponse"
+                },
+                "schedule": {
+                    "$ref": "#/definitions/models.Shift"
+                }
+            }
+        },
         "models.CreateUserRequest": {
             "type": "object",
             "properties": {
@@ -188,6 +293,25 @@
                 }
             }
         },
+        "models.DeleteShiftRequest": {
+            "type": "object",
+            "properties": {
+                "shift_uid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DeleteShiftResponse": {
+            "type": "object",
+            "properties": {
+                "base_response": {
+                    "$ref": "#/definitions/models.BaseResponse"
+                },
+                "shift": {
+                    "$ref": "#/definitions/models.Shift"
+                }
+            }
+        },
         "models.DeleteUserRequest": {
             "type": "object",
             "properties": {
@@ -204,6 +328,63 @@
                 },
                 "user": {
                     "$ref": "#/definitions/models.User"
+                }
+            }
+        },
+        "models.Shift": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "shift_length_in_hours": {
+                    "type": "number"
+                },
+                "uid": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "work_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateShiftRequest": {
+            "type": "object",
+            "properties": {
+                "assigned_user_email": {
+                    "type": "string"
+                },
+                "shift_length_in_hours": {
+                    "type": "number"
+                },
+                "shift_uid": {
+                    "type": "string"
+                },
+                "work_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateShiftResponse": {
+            "type": "object",
+            "properties": {
+                "base_response": {
+                    "$ref": "#/definitions/models.BaseResponse"
+                },
+                "shift": {
+                    "$ref": "#/definitions/models.Shift"
                 }
             }
         },

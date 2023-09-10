@@ -35,3 +35,15 @@ type DeleteShiftResponse struct {
 	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
 	Shift        *Shift               `json:"shift,omitempty"`
 }
+
+type UpdateShiftRequest struct {
+	ShiftUid           string  `json:"shift_uid,omitempty"`
+	WorkDate           string  `json:"work_date,omitempty"`
+	ShiftLenghtInHours float32 `json:"shift_length_in_hours,omitempty"`
+	AssignedUserEmail  string  `json:"assigned_user_email,omitempty"`
+}
+
+type UpdateShiftResponse struct {
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
+	Shift        *Shift               `json:"shift,omitempty"`
+}

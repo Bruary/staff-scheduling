@@ -9,6 +9,7 @@ import (
 type ControllerInterface interface {
 	CreateShift(ctx context.Context, req shiftsModels.CreateShiftRequest) *shiftsModels.CreateShiftResponse
 	DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftRequest) *shiftsModels.DeleteShiftResponse
+	UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftRequest) *shiftsModels.UpdateShiftResponse
 }
 
 type ControllerService struct {
@@ -43,4 +44,15 @@ func (s *ControllerService) CreateShift(ctx context.Context, req shiftsModels.Cr
 // @Router /api/v1/shift [delete]
 func (s *ControllerService) DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftRequest) *shiftsModels.DeleteShiftResponse {
 	return s.shiftsService.DeleteShift(ctx, req)
+}
+
+// @Title Update shift
+// @Summary Update shift
+// @ID update-shift
+// @Produce json
+// @Param req body shiftsModels.UpdateShiftRequest true "update shift request"
+// @Success 200 {object} shiftsModels.UpdateShiftResponse
+// @Router /api/v1/shift [patch]
+func (s *ControllerService) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftRequest) *shiftsModels.UpdateShiftResponse {
+	return s.shiftsService.UpdateShift(ctx, req)
 }
