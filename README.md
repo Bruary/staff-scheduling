@@ -14,6 +14,10 @@ The following tech stack and designs were used:
 - Docker
 - Domain-Driven Design
 
+### DB Schema:
+<img width="1106" alt="image" src="https://github.com/Bruary/staff-scheduling/assets/38393880/d0d60be6-35ef-4ca1-b914-4a0f896f78aa">
+
+
 
 ## Getting Started
 
