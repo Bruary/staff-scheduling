@@ -101,6 +101,12 @@ func main() {
 				return nil
 			}
 
+			// if endpoint is basic, then skip access validation
+			if endpointConfig.AccessLevel == models.BasicPermissionLevel {
+				c.Next()
+				return nil
+			}
+
 			// check if user have right access level
 			if user.Type != string(endpointConfig.AccessLevel) {
 				errResp := models.UserPermissionError
@@ -235,6 +241,24 @@ func main() {
 		}
 
 		response := shiftsController.UpdateShift(c.Context(), req)
+		respBytes, err := json.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		c.Context().SetBody(respBytes)
+		return nil
+	})
+
+	v1.Get("/shifts", func(c *fiber.Ctx) error {
+		req := shiftsModels.GetShiftsRequest{}
+
+		err := json.Unmarshal(c.Body(), &req)
+		if err != nil {
+			return err
+		}
+
+		response := shiftsController.GetShifts(c.Context(), req)
 		respBytes, err := json.Marshal(response)
 		if err != nil {
 			return err

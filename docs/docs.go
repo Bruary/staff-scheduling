@@ -123,6 +123,34 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/shifts": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get shifts",
+                "operationId": "get-shifts",
+                "parameters": [
+                    {
+                        "description": "gets shifts request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GetShiftsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetShiftsResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/signup": {
             "post": {
                 "produces": [
@@ -339,6 +367,37 @@ const docTemplate = `{
                 },
                 "user": {
                     "$ref": "#/definitions/models.User"
+                }
+            }
+        },
+        "models.GetShiftsRequest": {
+            "type": "object",
+            "properties": {
+                "from_date": {
+                    "type": "string"
+                },
+                "to_date": {
+                    "type": "string"
+                },
+                "user_emails": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "models.GetShiftsResponse": {
+            "type": "object",
+            "properties": {
+                "base_response": {
+                    "$ref": "#/definitions/models.BaseResponse"
+                },
+                "shifts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Shift"
+                    }
                 }
             }
         },

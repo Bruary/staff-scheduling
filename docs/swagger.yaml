@@ -84,6 +84,26 @@ definitions:
       user:
         $ref: '#/definitions/models.User'
     type: object
+  models.GetShiftsRequest:
+    properties:
+      from_date:
+        type: string
+      to_date:
+        type: string
+      user_emails:
+        items:
+          type: string
+        type: array
+    type: object
+  models.GetShiftsResponse:
+    properties:
+      base_response:
+        $ref: '#/definitions/models.BaseResponse'
+      shifts:
+        items:
+          $ref: '#/definitions/models.Shift'
+        type: array
+    type: object
   models.Shift:
     properties:
       created:
@@ -231,6 +251,24 @@ paths:
           schema:
             $ref: '#/definitions/models.CreateShiftResponse'
       summary: Create new shift
+  /api/v1/shifts:
+    get:
+      operationId: get-shifts
+      parameters:
+      - description: gets shifts request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetShiftsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetShiftsResponse'
+      summary: Get shifts
   /api/v1/signup:
     post:
       operationId: create-a-new-user

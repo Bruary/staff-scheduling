@@ -19,6 +19,7 @@ type ServiceInterface interface {
 	CreateShift(ctx context.Context, req shiftsModels.CreateShiftRequest) *shiftsModels.CreateShiftResponse
 	DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftRequest) *shiftsModels.DeleteShiftResponse
 	UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftRequest) *shiftsModels.UpdateShiftResponse
+	GetShifts(ctx context.Context, req shiftsModels.GetShiftsRequest) *shiftsModels.GetShiftsResponse
 }
 
 type Service struct {
@@ -354,5 +355,113 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 			UserId:             int(updatedShift.UserID),
 			Updated:            updatedShift.Updated.Time.String(),
 		},
+	}
+}
+
+func (s *Service) GetShifts(ctx context.Context, req shiftsModels.GetShiftsRequest) *shiftsModels.GetShiftsResponse {
+	var (
+		resp           []shiftsModels.Shift
+		fromDate       time.Time
+		toDate         time.Time
+		oneYearAgoDate = time.Now().UTC().Add(-time.Hour * 24 * 365)
+		err            error
+	)
+
+	// validate
+	if len(req.UsersEmails) == 0 {
+		return &shiftsModels.GetShiftsResponse{
+			BaseResponse: &coreModels.BaseResponse{
+				ErrorType:  coreModels.MissingParamError.ErrorType,
+				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.GetShifts: missing user_emails in the request"),
+			},
+		}
+	}
+
+	// Validate dates
+	if req.FromDate != "" {
+		fromDate, err = time.Parse(coreModels.YYYYMMDD_format, req.FromDate)
+		if err != nil {
+			return &shiftsModels.GetShiftsResponse{
+				BaseResponse: &coreModels.BaseResponse{
+					ErrorType:  coreModels.InvalidParamError.ErrorType,
+					ErrorMsg:   coreModels.InvalidParamError.ErrorMsg,
+					ErrorStack: append(coreModels.InvalidParamError.ErrorStack, fmt.Sprintf("Service.GetShifts: failed to parse from_date, format should be like: %s", coreModels.YYYYMMDD_format)),
+				},
+			}
+		}
+	}
+
+	// if from_date is not passed OR its more than 1 year, set default to 1 year ago
+	if req.FromDate == "" || (req.FromDate != "" && fromDate.UTC().Sub(oneYearAgoDate) < 0) {
+		fromDate = time.Now().UTC().Add(-time.Hour * 24 * 365)
+	}
+
+	if req.ToDate != "" {
+		toDate, err = time.Parse(coreModels.YYYYMMDD_format, req.ToDate)
+		if err != nil {
+			return &shiftsModels.GetShiftsResponse{
+				BaseResponse: &coreModels.BaseResponse{
+					ErrorType:  coreModels.InvalidParamError.ErrorType,
+					ErrorMsg:   coreModels.InvalidParamError.ErrorMsg,
+					ErrorStack: append(coreModels.InvalidParamError.ErrorStack, fmt.Sprintf("Service.GetShifts: failed to parse to_date, format should be like: %s", coreModels.YYYYMMDD_format)),
+				},
+			}
+		}
+	} else {
+		// if to_date is not provided, then default is now
+		toDate = time.Now().UTC()
+	}
+
+	// check if toDate is smaller than from date
+	difference := toDate.UTC().Sub(fromDate)
+	if difference < 0 {
+		return &shiftsModels.GetShiftsResponse{
+			BaseResponse: &coreModels.BaseResponse{
+				ErrorType:  coreModels.InvalidDateRangeError.ErrorType,
+				ErrorMsg:   coreModels.InvalidDateRangeError.ErrorMsg,
+				ErrorStack: append(coreModels.InvalidDateRangeError.ErrorStack, "Service.GetShifts: to_date can not be before from_date"),
+			},
+		}
+	}
+
+	// fetch all users shifts in the list provided and order them by work_date in desc format
+	userShifts, err := s.shiftsRepo.GetUsersShiftsByDateRange(ctx, sqlc.GetUsersShiftsByDateRangeParams{
+		Column1:    req.UsersEmails,
+		WorkDate:   fromDate,
+		WorkDate_2: toDate,
+	})
+	if err != nil {
+		return &shiftsModels.GetShiftsResponse{
+			BaseResponse: &coreModels.BaseResponse{
+				ErrorType:  coreModels.UnknownError.ErrorType,
+				ErrorMsg:   coreModels.UnknownError.ErrorMsg,
+				ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.GetShifts: failed to fetch users shifts err=%s", err.Error())),
+			},
+		}
+	}
+
+	// if no records, just return empty array
+	if len(userShifts) == 0 {
+		return &shiftsModels.GetShiftsResponse{
+			Shifts: resp,
+		}
+	}
+
+	// fill shifts extracted into the response
+	for _, shift := range userShifts {
+		resp = append(resp, shiftsModels.Shift{
+			Id:                 shift.ID,
+			Created:            shift.Created.String(),
+			Uid:                shift.Uid,
+			WorkDate:           shift.WorkDate,
+			ShiftLenghtInHours: float32(shift.ShiftLengthHours),
+			UserId:             int(shift.UserID),
+			Updated:            shift.Updated.Time.String(),
+		})
+	}
+
+	return &shiftsModels.GetShiftsResponse{
+		Shifts: resp,
 	}
 }

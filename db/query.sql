@@ -41,3 +41,6 @@ UPDATE shifts SET shift_length_hours = $1 WHERE uid = $2 AND deleted IS NULL RET
 
 -- name: GetShiftByUid :one
 SELECT * FROM shifts WHERE uid = $1 AND deleted IS NULL;
+
+-- name: GetUsersShiftsByDateRange :many
+SELECT * FROM shifts WHERE user_id IN (SELECT id FROM users WHERE email = ANY($1::varchar[])) AND work_date >= $2 AND work_date <= $3 AND deleted IS NULL ORDER BY work_date DESC;

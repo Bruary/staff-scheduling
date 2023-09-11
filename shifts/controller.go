@@ -10,6 +10,7 @@ type ControllerInterface interface {
 	CreateShift(ctx context.Context, req shiftsModels.CreateShiftRequest) *shiftsModels.CreateShiftResponse
 	DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftRequest) *shiftsModels.DeleteShiftResponse
 	UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftRequest) *shiftsModels.UpdateShiftResponse
+	GetShifts(ctx context.Context, req shiftsModels.GetShiftsRequest) *shiftsModels.GetShiftsResponse
 }
 
 type ControllerService struct {
@@ -55,4 +56,15 @@ func (s *ControllerService) DeleteShift(ctx context.Context, req shiftsModels.De
 // @Router /api/v1/shift [patch]
 func (s *ControllerService) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftRequest) *shiftsModels.UpdateShiftResponse {
 	return s.shiftsService.UpdateShift(ctx, req)
+}
+
+// @Title Get shifts
+// @Summary Get shifts
+// @ID get-shifts
+// @Produce json
+// @Param req body shiftsModels.GetShiftsRequest true "gets shifts request"
+// @Success 200 {object} shiftsModels.GetShiftsResponse
+// @Router /api/v1/shifts [get]
+func (s *ControllerService) GetShifts(ctx context.Context, req shiftsModels.GetShiftsRequest) *shiftsModels.GetShiftsResponse {
+	return s.shiftsService.GetShifts(ctx, req)
 }

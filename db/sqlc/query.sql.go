@@ -8,6 +8,8 @@ package db
 import (
 	"context"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 const createShift = `-- name: CreateShift :one
@@ -198,6 +200,48 @@ SELECT id, created, uid, work_date, shift_length_hours, user_id, updated, delete
 
 func (q *Queries) GetUserShifts(ctx context.Context, email string) ([]Shift, error) {
 	rows, err := q.db.QueryContext(ctx, getUserShifts, email)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Shift
+	for rows.Next() {
+		var i Shift
+		if err := rows.Scan(
+			&i.ID,
+			&i.Created,
+			&i.Uid,
+			&i.WorkDate,
+			&i.ShiftLengthHours,
+			&i.UserID,
+			&i.Updated,
+			&i.Deleted,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUsersShiftsByDateRange = `-- name: GetUsersShiftsByDateRange :many
+SELECT id, created, uid, work_date, shift_length_hours, user_id, updated, deleted FROM shifts WHERE user_id IN (SELECT id FROM users WHERE email = ANY($1::varchar[])) AND work_date >= $2 AND work_date <= $3 AND deleted IS NULL ORDER BY work_date DESC
+`
+
+type GetUsersShiftsByDateRangeParams struct {
+	Column1    []string
+	WorkDate   time.Time
+	WorkDate_2 time.Time
+}
+
+func (q *Queries) GetUsersShiftsByDateRange(ctx context.Context, arg GetUsersShiftsByDateRangeParams) ([]Shift, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersShiftsByDateRange, pq.Array(arg.Column1), arg.WorkDate, arg.WorkDate_2)
 	if err != nil {
 		return nil, err
 	}

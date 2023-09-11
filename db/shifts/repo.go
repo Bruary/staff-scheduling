@@ -16,6 +16,7 @@ type ShiftsRepoInterface interface {
 	UpdateShiftWorkDate(ctx context.Context, params sqlc.UpdateShiftWorkDateParams) (sqlc.Shift, error)
 	UpdateShiftLength(ctx context.Context, params sqlc.UpdateShiftLengthParams) (sqlc.Shift, error)
 	GetShiftByUid(ctx context.Context, uid string) (sqlc.Shift, error)
+	GetUsersShiftsByDateRange(ctx context.Context, params sqlc.GetUsersShiftsByDateRangeParams) ([]sqlc.Shift, error)
 }
 
 type ShiftsRepo struct {
@@ -58,4 +59,8 @@ func (s *ShiftsRepo) UpdateShiftLength(ctx context.Context, params sqlc.UpdateSh
 
 func (s *ShiftsRepo) GetShiftByUid(ctx context.Context, uid string) (sqlc.Shift, error) {
 	return s.provider.GetShiftByUid(ctx, uid)
+}
+
+func (s *ShiftsRepo) GetUsersShiftsByDateRange(ctx context.Context, params sqlc.GetUsersShiftsByDateRangeParams) ([]sqlc.Shift, error) {
+	return s.provider.GetUsersShiftsByDateRange(ctx, params)
 }

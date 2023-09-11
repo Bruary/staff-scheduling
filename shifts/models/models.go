@@ -47,3 +47,14 @@ type UpdateShiftResponse struct {
 	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
 	Shift        *Shift               `json:"shift,omitempty"`
 }
+
+type GetShiftsRequest struct {
+	UsersEmails []string `json:"user_emails"`
+	FromDate    string   `json:"from_date,omitempty"`
+	ToDate      string   `json:"to_date,omitempty"`
+}
+
+type GetShiftsResponse struct {
+	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
+	Shifts       []Shift              `json:"shifts,omitempty"`
+}
