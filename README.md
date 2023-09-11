@@ -36,7 +36,7 @@ git clone git@github.com:Bruary/staff-scheduling.git
 **Note: Make sure Docker Desktop app is running in the background before continuing**
 
 
-After this, spin up the containers using:
+After this, open the repo using VSCode and on the root directory spin up the containers using:
 ```
 docker-compose up
 ```
