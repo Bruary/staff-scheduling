@@ -33,11 +33,6 @@ Finally, **clone the repo**. Run the below command on the terminal _(on mac pres
 git clone git@github.com:Bruary/staff-scheduling.git
 ```
 
-Now, open the repo using VSCode and on the root of the repo, run the below command to install all dependencies:
-```
-go mod vendor
-```
-
 **Note: Make sure Docker Desktop app is running in the background before continuing**
 
 
