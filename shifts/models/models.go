@@ -56,5 +56,5 @@ type GetShiftsRequest struct {
 
 type GetShiftsResponse struct {
 	BaseResponse *models.BaseResponse `json:"base_response,omitempty"`
-	Shifts       []Shift              `json:"shifts,omitempty"`
+	Shifts       []Shift              `json:"shifts"`
 }

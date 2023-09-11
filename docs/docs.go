@@ -234,6 +234,34 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/users/shifts": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all users with accumulated work hours",
+                "operationId": "get-all-users-with-shifts",
+                "parameters": [
+                    {
+                        "description": "get all users with shifts request",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GetAllUsersRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.GetAllUsersResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -370,6 +398,31 @@ const docTemplate = `{
                 }
             }
         },
+        "models.GetAllUsersRequest": {
+            "type": "object",
+            "properties": {
+                "from_date": {
+                    "type": "string"
+                },
+                "to_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.GetAllUsersResponse": {
+            "type": "object",
+            "properties": {
+                "base_response": {
+                    "$ref": "#/definitions/models.BaseResponse"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserWithShifts"
+                    }
+                }
+            }
+        },
         "models.GetShiftsRequest": {
             "type": "object",
             "properties": {
@@ -503,6 +556,44 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "uid": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserWithShifts": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "shifts_length_in_hours": {
+                    "type": "number"
                 },
                 "type": {
                     "type": "string"

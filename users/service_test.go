@@ -10,6 +10,7 @@ import (
 	coreModels "github.com/Bruary/staff-scheduling/core/models"
 	sqlc "github.com/Bruary/staff-scheduling/db/sqlc"
 	usersRepoMock "github.com/Bruary/staff-scheduling/db/users/mocks"
+	shiftsServiceMock "github.com/Bruary/staff-scheduling/shifts/mocks"
 	"github.com/Bruary/staff-scheduling/users"
 	"github.com/Bruary/staff-scheduling/users/models"
 	"github.com/stretchr/testify/assert"
@@ -107,7 +108,8 @@ func TestCreateUser(t *testing.T) {
 	}
 
 	userRepoMock := usersRepoMock.UsersRepoInterface{}
-	usersService := users.New(&userRepoMock)
+	shiftsServiceMock := shiftsServiceMock.ServiceInterface{}
+	usersService := users.New(&userRepoMock, &shiftsServiceMock)
 
 	ctx := context.Background()
 

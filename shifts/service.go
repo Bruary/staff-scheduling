@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// mockery --dir=shifts --name=ServiceInterface --output=shifts/mocks --case=underscore
 type ServiceInterface interface {
 	CreateShift(ctx context.Context, req shiftsModels.CreateShiftRequest) *shiftsModels.CreateShiftResponse
 	DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftRequest) *shiftsModels.DeleteShiftResponse
@@ -444,7 +445,7 @@ func (s *Service) GetShifts(ctx context.Context, req shiftsModels.GetShiftsReque
 	// if no records, just return empty array
 	if len(userShifts) == 0 {
 		return &shiftsModels.GetShiftsResponse{
-			Shifts: resp,
+			Shifts: []shiftsModels.Shift{},
 		}
 	}
 

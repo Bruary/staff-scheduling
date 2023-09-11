@@ -17,6 +17,11 @@ type User struct {
 	Deleted   string `json:"deleted,omitempty"`
 }
 
+type UserWithShifts struct {
+	User
+	ShiftsLengthInHours float32 `json:"shifts_length_in_hours"`
+}
+
 type CreateUserRequest struct {
 	FirstName string `json:"first_name,omitempty"`
 	LastName  string `json:"last_name,omitempty"`
@@ -31,6 +36,16 @@ type CreateUserResponse struct {
 
 type GetUserByEmailRequest struct {
 	Email string `json:"email,omitempty"`
+}
+
+type GetAllUsersRequest struct {
+	FromDate string `json:"from_date,omitempty"`
+	ToDate   string `json:"to_date,omitempty"`
+}
+
+type GetAllUsersResponse struct {
+	BaseResponse   *models.BaseResponse `json:"base_response,omitempty"`
+	UserWithShifts []UserWithShifts     `json:"users"`
 }
 
 type GetUserResponse struct {

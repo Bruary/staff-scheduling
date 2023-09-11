@@ -3,11 +3,14 @@ package users
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/Bruary/staff-scheduling/core/models"
 	sqlc "github.com/Bruary/staff-scheduling/db/sqlc"
 	userRepo "github.com/Bruary/staff-scheduling/db/users"
+	"github.com/Bruary/staff-scheduling/shifts"
 	userModels "github.com/Bruary/staff-scheduling/users/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -24,17 +27,20 @@ type ServiceInterface interface {
 	GetUserByUID(ctx context.Context, userUID string) *userModels.GetUserResponse
 	DeleteUser(context.Context, userModels.DeleteUserRequest) *userModels.DeleteUserResponse
 	UpdateUserPermissionLevel(context.Context, userModels.UpdateUserPermissionLevelRequest) *userModels.UpdateUserPermissionLevelResponse
+	GetAllUsersWithShifts(ctx context.Context, req userModels.GetAllUsersRequest) *userModels.GetAllUsersResponse
 }
 
 type Service struct {
-	UserRepo userRepo.UsersRepoInterface
+	UserRepo      userRepo.UsersRepoInterface
+	ShiftsService shifts.ServiceInterface
 }
 
 var _ ServiceInterface = &Service{}
 
-func New(userRepo userRepo.UsersRepoInterface) *Service {
+func New(userRepo userRepo.UsersRepoInterface, ShiftsService shifts.ServiceInterface) *Service {
 	return &Service{
-		UserRepo: userRepo,
+		UserRepo:      userRepo,
+		ShiftsService: ShiftsService,
 	}
 }
 
@@ -363,6 +369,105 @@ func (s *Service) UpdateUserPermissionLevel(ctx context.Context, req userModels.
 			Password:  user.Password,
 			Updated:   user.Updated.String(),
 		},
+	}
+}
+
+func (s *Service) GetAllUsersWithShifts(ctx context.Context, req userModels.GetAllUsersRequest) *userModels.GetAllUsersResponse {
+	var (
+		fromDate       time.Time
+		toDate         time.Time
+		oneYearAgoDate = time.Now().UTC().Add(-time.Hour * 24 * 365)
+		err            error
+		resp           []userModels.UserWithShifts
+	)
+
+	// validation
+	if req.FromDate != "" {
+		fromDate, err = time.Parse(models.YYYYMMDD_format, req.FromDate)
+		if err != nil {
+			return &userModels.GetAllUsersResponse{
+				BaseResponse: &models.BaseResponse{
+					ErrorType:  models.InvalidParamError.ErrorType,
+					ErrorMsg:   models.InvalidParamError.ErrorMsg,
+					ErrorStack: append(models.InvalidParamError.ErrorStack, fmt.Sprintf("Service.GetAllUsers: failed to parse from_date, format should be like: %s", models.YYYYMMDD_format)),
+				},
+			}
+		}
+	}
+
+	// if from_date is not passed OR its more than 1 year, set default to 1 year ago
+	if req.FromDate == "" || (req.FromDate != "" && fromDate.UTC().Sub(oneYearAgoDate) < 0) {
+		fromDate = time.Now().UTC().Add(-time.Hour * 24 * 365)
+	}
+
+	if req.ToDate != "" {
+		toDate, err = time.Parse(models.YYYYMMDD_format, req.ToDate)
+		if err != nil {
+			return &userModels.GetAllUsersResponse{
+				BaseResponse: &models.BaseResponse{
+					ErrorType:  models.InvalidParamError.ErrorType,
+					ErrorMsg:   models.InvalidParamError.ErrorMsg,
+					ErrorStack: append(models.InvalidParamError.ErrorStack, fmt.Sprintf("Service.GetAllUsers: failed to parse to_date, format should be like: %s", models.YYYYMMDD_format)),
+				},
+			}
+		}
+	} else {
+		// if to_date is not provided, then default is now
+		toDate = time.Now().UTC()
+	}
+
+	// check if toDate is smaller than from date
+	difference := toDate.UTC().Sub(fromDate)
+	if difference < 0 {
+		return &userModels.GetAllUsersResponse{
+			BaseResponse: &models.BaseResponse{
+				ErrorType:  models.InvalidDateRangeError.ErrorType,
+				ErrorMsg:   models.InvalidDateRangeError.ErrorMsg,
+				ErrorStack: append(models.InvalidDateRangeError.ErrorStack, "Service.GetAllUsers: to_date can not be before from_date"),
+			},
+		}
+	}
+
+	// get all users with shifts
+	usersWithShifts, err := s.UserRepo.GetAllUsersWithShifts(ctx, sqlc.GetAllUsersWithShiftsParams{
+		WorkDate:   fromDate,
+		WorkDate_2: toDate,
+	})
+	if err != nil {
+		return &userModels.GetAllUsersResponse{
+			BaseResponse: &models.BaseResponse{
+				ErrorType:  models.UnknownError.ErrorType,
+				ErrorMsg:   models.UnknownError.ErrorMsg,
+				ErrorStack: append(models.UnknownError.ErrorStack, fmt.Sprintf("Service.GetAllUsers: failed to get all users with shifts, err=%s", err.Error())),
+			},
+		}
+	}
+
+	// if no records, just return empty array
+	if len(usersWithShifts) == 0 {
+		return &userModels.GetAllUsersResponse{
+			UserWithShifts: []userModels.UserWithShifts{},
+		}
+	}
+
+	// fill response
+	for _, userWithShift := range usersWithShifts {
+		resp = append(resp, userModels.UserWithShifts{
+			User: userModels.User{
+				Id:        userWithShift.ID,
+				Created:   userWithShift.Created.String(),
+				Type:      userWithShift.Type,
+				Uid:       userWithShift.Uid,
+				FirstName: userWithShift.FirstName,
+				LastName:  userWithShift.LastName,
+				Email:     userWithShift.Email,
+			},
+			ShiftsLengthInHours: float32(userWithShift.TotalHours),
+		})
+	}
+
+	return &userModels.GetAllUsersResponse{
+		UserWithShifts: resp,
 	}
 }
 

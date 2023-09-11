@@ -62,6 +62,32 @@ func (_m *UsersRepoInterface) DeleteUser(ctx context.Context, email string) (db.
 	return r0, r1
 }
 
+// GetAllUsersWithShifts provides a mock function with given fields: ctx, params
+func (_m *UsersRepoInterface) GetAllUsersWithShifts(ctx context.Context, params db.GetAllUsersWithShiftsParams) ([]db.GetAllUsersWithShiftsRow, error) {
+	ret := _m.Called(ctx, params)
+
+	var r0 []db.GetAllUsersWithShiftsRow
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.GetAllUsersWithShiftsParams) ([]db.GetAllUsersWithShiftsRow, error)); ok {
+		return rf(ctx, params)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.GetAllUsersWithShiftsParams) []db.GetAllUsersWithShiftsRow); ok {
+		r0 = rf(ctx, params)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]db.GetAllUsersWithShiftsRow)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.GetAllUsersWithShiftsParams) error); ok {
+		r1 = rf(ctx, params)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetUserByEmail provides a mock function with given fields: ctx, email
 func (_m *UsersRepoInterface) GetUserByEmail(ctx context.Context, email string) (db.User, error) {
 	ret := _m.Called(ctx, email)

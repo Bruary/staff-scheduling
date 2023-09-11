@@ -11,6 +11,7 @@ type ControllerInterface interface {
 	GetUserByEmail(ctx context.Context, req userModels.GetUserByEmailRequest) *userModels.GetUserResponse
 	DeleteUser(context.Context, userModels.DeleteUserRequest) *userModels.DeleteUserResponse
 	UpdateUserPermissionLevel(ctx context.Context, req userModels.UpdateUserPermissionLevelRequest) *userModels.UpdateUserPermissionLevelResponse
+	GetAllUsersWithShifts(ctx context.Context, req userModels.GetAllUsersRequest) *userModels.GetAllUsersResponse
 }
 
 type ControllerService struct {
@@ -60,4 +61,15 @@ func (s *ControllerService) DeleteUser(ctx context.Context, req userModels.Delet
 // @Router /api/v1/user/permission [put]
 func (s *ControllerService) UpdateUserPermissionLevel(ctx context.Context, req userModels.UpdateUserPermissionLevelRequest) *userModels.UpdateUserPermissionLevelResponse {
 	return s.usersService.UpdateUserPermissionLevel(ctx, req)
+}
+
+// @Title Get All Users With Shifts
+// @Summary Get all users with accumulated work hours
+// @ID get-all-users-with-shifts
+// @Produce json
+// @Param req body userModels.GetAllUsersRequest true "get all users with shifts request"
+// @Success 200 {object} userModels.GetAllUsersResponse
+// @Router /api/v1/users/shifts [get]
+func (s *ControllerService) GetAllUsersWithShifts(ctx context.Context, req userModels.GetAllUsersRequest) *userModels.GetAllUsersResponse {
+	return s.usersService.GetAllUsersWithShifts(ctx, req)
 }

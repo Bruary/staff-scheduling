@@ -84,6 +84,22 @@ definitions:
       user:
         $ref: '#/definitions/models.User'
     type: object
+  models.GetAllUsersRequest:
+    properties:
+      from_date:
+        type: string
+      to_date:
+        type: string
+    type: object
+  models.GetAllUsersResponse:
+    properties:
+      base_response:
+        $ref: '#/definitions/models.BaseResponse'
+      users:
+        items:
+          $ref: '#/definitions/models.UserWithShifts'
+        type: array
+    type: object
   models.GetShiftsRequest:
     properties:
       from_date:
@@ -171,6 +187,31 @@ definitions:
         type: string
       password:
         type: string
+      type:
+        type: string
+      uid:
+        type: string
+      updated:
+        type: string
+    type: object
+  models.UserWithShifts:
+    properties:
+      created:
+        type: string
+      deleted:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      password:
+        type: string
+      shifts_length_in_hours:
+        type: number
       type:
         type: string
       uid:
@@ -323,4 +364,22 @@ paths:
           schema:
             $ref: '#/definitions/models.UpdateUserPermissionLevelResponse'
       summary: Update user permission level
+  /api/v1/users/shifts:
+    get:
+      operationId: get-all-users-with-shifts
+      parameters:
+      - description: get all users with shifts request
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetAllUsersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetAllUsersResponse'
+      summary: Get all users with accumulated work hours
 swagger: "2.0"

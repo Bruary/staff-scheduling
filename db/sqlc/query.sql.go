@@ -130,6 +130,62 @@ func (q *Queries) DeleteUser(ctx context.Context, email string) (User, error) {
 	return i, err
 }
 
+const getAllUsersWithShifts = `-- name: GetAllUsersWithShifts :many
+SELECT users.id, users.created, users.uid, users.email, users."type",users.first_name, users.last_name, sum(shifts.shift_length_hours) as total_hours from users 
+Inner Join shifts on shifts.user_id = users.id
+WHERE shifts.work_date >= $1 AND shifts.work_date <= $2 AND users.deleted IS NULL AND shifts.deleted IS NULL
+group by users.id
+Order by total_hours DESC
+`
+
+type GetAllUsersWithShiftsParams struct {
+	WorkDate   time.Time
+	WorkDate_2 time.Time
+}
+
+type GetAllUsersWithShiftsRow struct {
+	ID         int32
+	Created    time.Time
+	Uid        string
+	Email      string
+	Type       string
+	FirstName  string
+	LastName   string
+	TotalHours int64
+}
+
+func (q *Queries) GetAllUsersWithShifts(ctx context.Context, arg GetAllUsersWithShiftsParams) ([]GetAllUsersWithShiftsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllUsersWithShifts, arg.WorkDate, arg.WorkDate_2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllUsersWithShiftsRow
+	for rows.Next() {
+		var i GetAllUsersWithShiftsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Created,
+			&i.Uid,
+			&i.Email,
+			&i.Type,
+			&i.FirstName,
+			&i.LastName,
+			&i.TotalHours,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getShiftByUid = `-- name: GetShiftByUid :one
 SELECT id, created, uid, work_date, shift_length_hours, user_id, updated, deleted FROM shifts WHERE uid = $1 AND deleted IS NULL
 `

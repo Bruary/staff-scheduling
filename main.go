@@ -35,9 +35,9 @@ func main() {
 	shiftsRepo := shiftsRepo.New(dbConn)
 
 	// services registry
-	usersService := users.New(usersRepo)
-	authService := auth.New(usersService)
 	shiftsService := shifts.New(usersRepo, shiftsRepo)
+	usersService := users.New(usersRepo, &shiftsService)
+	authService := auth.New(usersService)
 
 	// controllers
 	usersController := users.NewControllerService(usersService)
@@ -47,7 +47,7 @@ func main() {
 	app := fiber.New()
 
 	// documentaion open api
-	app.Get("/swagger/*", swagger.New())
+	app.Get("/docs/*", swagger.New())
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
@@ -187,6 +187,24 @@ func main() {
 		}
 
 		response := usersController.DeleteUser(c.Context(), req)
+		respBytes, err := json.Marshal(response)
+		if err != nil {
+			return err
+		}
+
+		c.Context().SetBody(respBytes)
+		return nil
+	})
+
+	v1.Get("/users/shifts", func(c *fiber.Ctx) error {
+		req := userModels.GetAllUsersRequest{}
+
+		err := json.Unmarshal(c.Body(), &req)
+		if err != nil {
+			return err
+		}
+
+		response := usersController.GetAllUsersWithShifts(c.Context(), req)
 		respBytes, err := json.Marshal(response)
 		if err != nil {
 			return err

@@ -150,7 +150,7 @@ func generateJWTToken(uid string) (string, error) {
 	claims := &JWTClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: &jwt.NumericDate{
-				Time: time.Now().Add(time.Minute * 5),
+				Time: time.Now().Add(time.Minute * 30),
 			},
 		},
 		UserUid: uid,

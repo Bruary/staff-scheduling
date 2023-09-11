@@ -14,6 +14,7 @@ type UsersRepoInterface interface {
 	GetUserByUid(ctx context.Context, uid string) (sqlc.User, error)
 	UpdateUserPermissionLevel(ctx context.Context, params sqlc.UpdateUserPermissionLevelParams) (sqlc.User, error)
 	DeleteUser(ctx context.Context, email string) (sqlc.User, error)
+	GetAllUsersWithShifts(ctx context.Context, params sqlc.GetAllUsersWithShiftsParams) ([]sqlc.GetAllUsersWithShiftsRow, error)
 }
 
 type UsersRepo struct {
@@ -48,4 +49,8 @@ func (s *UsersRepo) UpdateUserPermissionLevel(ctx context.Context, params sqlc.U
 
 func (s *UsersRepo) DeleteUser(ctx context.Context, email string) (sqlc.User, error) {
 	return s.provider.DeleteUser(ctx, email)
+}
+
+func (s *UsersRepo) GetAllUsersWithShifts(ctx context.Context, params sqlc.GetAllUsersWithShiftsParams) ([]sqlc.GetAllUsersWithShiftsRow, error) {
+	return s.provider.GetAllUsersWithShifts(ctx, params)
 }

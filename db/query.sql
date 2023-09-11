@@ -17,6 +17,13 @@ UPDATE users SET type=$1 WHERE email=$2 RETURNING *;
 -- name: DeleteUser :one
 UPDATE users SET deleted = now() WHERE email = $1 RETURNING *;
 
+-- name: GetAllUsersWithShifts :many
+SELECT users.id, users.created, users.uid, users.email, users."type",users.first_name, users.last_name, sum(shifts.shift_length_hours) as total_hours from users 
+Inner Join shifts on shifts.user_id = users.id
+WHERE shifts.work_date >= $1 AND shifts.work_date <= $2 AND users.deleted IS NULL AND shifts.deleted IS NULL
+group by users.id
+Order by total_hours DESC;
+
 -- name: CreateShift :one
 INSERT INTO shifts (
         uid, work_date, shift_length_hours, user_id
