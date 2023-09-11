@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	models "github.com/Bruary/staff-scheduling/core/models"
@@ -61,11 +62,14 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 		Email: req.Email,
 	})
 	if user.BaseResponse != nil {
+
+		fmt.Printf("Service.Login: failed to get user, user_email=%s err=%s", req.Email, user.BaseResponse.ErrorMsg)
+
 		return &LoginResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType:  "Unknown error",
-				ErrorMsg:   "Login. Failed to get user information",
-				ErrorStack: append(user.BaseResponse.ErrorStack),
+				ErrorType:  models.InvalidCredentialsError.ErrorType,
+				ErrorMsg:   models.InvalidCredentialsError.ErrorMsg,
+				ErrorStack: append(models.InvalidCredentialsError.ErrorStack, "Invalid email or passowrd used, please try again"),
 			},
 		}
 	}
@@ -74,8 +78,9 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 	if req.Email != user.User.Email {
 		return &LoginResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Invalid credentials",
-				ErrorMsg:  "Login. Invalid user credentials",
+				ErrorType:  models.InvalidCredentialsError.ErrorType,
+				ErrorMsg:   models.InvalidCredentialsError.ErrorMsg,
+				ErrorStack: append(models.InvalidCredentialsError.ErrorStack, "Invalid email or passowrd used, please try again"),
 			},
 		}
 	}
@@ -83,8 +88,9 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 	if !users.CheckPasswordHash(req.Password, user.User.Password) {
 		return &LoginResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Invalid credentials",
-				ErrorMsg:  "Login. Invalid user credentials",
+				ErrorType:  models.InvalidCredentialsError.ErrorType,
+				ErrorMsg:   models.InvalidCredentialsError.ErrorMsg,
+				ErrorStack: append(models.InvalidCredentialsError.ErrorStack, "Invalid email or passowrd used, please try again"),
 			},
 		}
 	}
@@ -94,10 +100,13 @@ func (s *Service) Login(ctx context.Context, req LoginRequest) *LoginResponse {
 		UserUid: user.User.Uid,
 	})
 	if resp.BaseResponse != nil {
+
+		fmt.Printf("Service.Login: failed to create JWT token, err=%s", resp.BaseResponse.ErrorMsg)
+
 		return &LoginResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Unknown error",
-				ErrorMsg:  "Login. Error when trying to create a token.",
+				ErrorType: models.UnknownError.ErrorType,
+				ErrorMsg:  models.UnknownError.ErrorMsg,
 			},
 		}
 	}

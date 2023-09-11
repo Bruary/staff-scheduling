@@ -22,14 +22,38 @@ func init() {
 
 func TestCreateUser(t *testing.T) {
 	tests := map[string]struct {
-		insertUserParams  sqlc.CreateUserParams
-		createUserResp    sqlc.User
-		resp              models.CreateUserResponse
-		getUserResp       sqlc.User
-		getUserErr        error
-		userAlreadyExists bool
-		errorType         string
+		insertUserParams     sqlc.CreateUserParams
+		createUserResp       sqlc.User
+		resp                 models.CreateUserResponse
+		getUserResp          sqlc.User
+		getUserErr           error
+		shouldCallCreateUser bool
+		shouldCallGetUser    bool
+		missingParam         bool
+		shouldError          bool
+		errorType            string
 	}{
+		"Should fail if user email is missing": {
+			insertUserParams: sqlc.CreateUserParams{
+				Uid:       users.UidForTests,
+				FirstName: "Bakir",
+				LastName:  "Kais",
+				Email:     "",
+				Password:  "helloWorld",
+			},
+			createUserResp: sqlc.User{
+				ID:        1,
+				Type:      string(coreModels.BasicPermissionLevel),
+				Uid:       users.UidForTests,
+				FirstName: "Bakir",
+				LastName:  "Kais",
+				Email:     "bakirtest@test.com",
+				Password:  "helloWorld",
+			},
+			shouldCallCreateUser: false,
+			shouldError:          true,
+			errorType:            coreModels.MissingParamError.ErrorType,
+		},
 		"Should fail if user already exists": {
 			insertUserParams: sqlc.CreateUserParams{
 				Uid:       users.UidForTests,
@@ -37,17 +61,6 @@ func TestCreateUser(t *testing.T) {
 				LastName:  "Kais",
 				Email:     "bakirtest@test.com",
 				Password:  "helloWorld",
-			},
-			resp: models.CreateUserResponse{
-				User: models.User{
-					Id:        1,
-					Type:      string(coreModels.BasicPermissionLevel),
-					Uid:       users.UidForTests,
-					FirstName: "Bakir",
-					LastName:  "Kais",
-					Email:     "bakirtest@test.com",
-					Password:  "helloWorld",
-				},
 			},
 			createUserResp: sqlc.User{
 				ID:        1,
@@ -67,9 +80,10 @@ func TestCreateUser(t *testing.T) {
 				Email:     "bakirtest@test.com",
 				Password:  "helloWorld",
 			},
-			userAlreadyExists: true,
-			getUserErr:        nil,
-			errorType:         "User already exists",
+			shouldCallCreateUser: false,
+			shouldError:          true,
+			errorType:            coreModels.UserAlreadyExistError.ErrorType,
+			shouldCallGetUser:    true,
 		},
 		"Should successed if all params are passed and valid": {
 			insertUserParams: sqlc.CreateUserParams{
@@ -101,9 +115,10 @@ func TestCreateUser(t *testing.T) {
 				Email:     "bakirtest_2@test.com",
 				Password:  "helloWorld",
 			},
-			getUserResp:       sqlc.User{},
-			getUserErr:        sql.ErrNoRows,
-			userAlreadyExists: false,
+			getUserErr:           sql.ErrNoRows,
+			shouldError:          false,
+			shouldCallCreateUser: true,
+			shouldCallGetUser:    true,
 		},
 	}
 
@@ -115,10 +130,12 @@ func TestCreateUser(t *testing.T) {
 
 	for _, tc := range tests {
 
-		userRepoMock.On("GetUserByEmail", ctx, tc.insertUserParams.Email).Return(tc.getUserResp, tc.getUserErr)
+		if tc.shouldCallGetUser {
+			userRepoMock.On("GetUserByEmail", ctx, tc.insertUserParams.Email).Return(tc.getUserResp, tc.getUserErr)
+		}
 		defer userRepoMock.AssertExpectations(t)
 
-		if !tc.userAlreadyExists {
+		if tc.shouldCallCreateUser {
 			userRepoMock.On("CreateUser", ctx, tc.insertUserParams).Return(tc.createUserResp, nil)
 		}
 
@@ -128,11 +145,12 @@ func TestCreateUser(t *testing.T) {
 			Email:     tc.insertUserParams.Email,
 			Password:  tc.insertUserParams.Password,
 		})
-		if tc.userAlreadyExists {
+
+		if tc.shouldError {
 			assert.Equal(t, resp.BaseResponse.ErrorType, tc.errorType)
 		}
 
-		if !tc.userAlreadyExists {
+		if !tc.shouldError {
 			assert.Equal(t, tc.resp.User.Email, resp.User.Email)
 			assert.Equal(t, tc.resp.User.Type, resp.User.Type)
 			assert.Equal(t, tc.resp.User.Uid, resp.User.Uid)

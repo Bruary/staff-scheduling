@@ -45,7 +45,7 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.MissingParamError.ErrorType,
 				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
-				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.CreateSchedule: user email is missing"),
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "User email is missing"),
 			},
 		}
 	}
@@ -55,7 +55,7 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.MissingParamError.ErrorType,
 				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
-				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.CreateSchedule: shift length is missing"),
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Shift length is missing"),
 			},
 		}
 	}
@@ -65,7 +65,7 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.InvalidParamError.ErrorType,
 				ErrorMsg:   coreModels.InvalidParamError.ErrorMsg,
-				ErrorStack: append(coreModels.InvalidParamError.ErrorStack, "Service.CreateSchedule: shift length can not be less than 0.5 hours or more than 12 hours"),
+				ErrorStack: append(coreModels.InvalidParamError.ErrorStack, "Shift length can not be less than 0.5 hours or more than 12 hours"),
 			},
 		}
 	}
@@ -75,7 +75,7 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.MissingParamError.ErrorType,
 				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
-				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.CreateSchedule: work date is missing"),
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Work date is missing"),
 			},
 		}
 	}
@@ -87,7 +87,7 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.InvalidParamError.ErrorType,
 				ErrorMsg:   coreModels.InvalidParamError.ErrorMsg,
-				ErrorStack: append(coreModels.InvalidParamError.ErrorStack, fmt.Sprintf("Service.CreateSchedule: work date is invalid, correct format:%s ", coreModels.YYYYMMDD_format)),
+				ErrorStack: append(coreModels.InvalidParamError.ErrorStack, fmt.Sprintf("Work date is invalid, correct format:%s ", coreModels.YYYYMMDD_format)),
 			},
 		}
 	}
@@ -103,7 +103,7 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.UnknownError.ErrorType,
 				ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-				ErrorStack: append(coreModels.UnknownError.ErrorStack, "Service.CreateSchedule: failed to get user by email, err="+err.Error()),
+				ErrorStack: append(coreModels.UnknownError.ErrorStack, "Wailed to get user by email, err="+err.Error()),
 			},
 		}
 	}
@@ -115,7 +115,7 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.UnknownError.ErrorType,
 				ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-				ErrorStack: append(coreModels.UnknownError.ErrorStack, "Service.CreateSchedule: failed to get user shifts, err="+err.Error()),
+				ErrorStack: append(coreModels.UnknownError.ErrorStack, "Failed to get user shifts, err="+err.Error()),
 			},
 		}
 	}
@@ -129,7 +129,7 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 				BaseResponse: &coreModels.BaseResponse{
 					ErrorType:  coreModels.ShiftAlreadyExistError.ErrorType,
 					ErrorMsg:   coreModels.ShiftAlreadyExistError.ErrorMsg,
-					ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.CreateSchedule: shift already exist on %s for user_id=%v", shift.WorkDate, shift.UserID)),
+					ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Shift already exist on %s for user_id=%v", shift.WorkDate, shift.UserID)),
 				},
 			}
 		}
@@ -149,7 +149,7 @@ func (s *Service) CreateShift(ctx context.Context, req shiftsModels.CreateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.UnknownError.ErrorType,
 				ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-				ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.CreateSchedule: failed to create a new shift, user_id=%v", shift.UserID)),
+				ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Failed to create a new shift, user_id=%v", shift.UserID)),
 			},
 		}
 	}
@@ -174,7 +174,7 @@ func (s *Service) DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.MissingParamError.ErrorType,
 				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
-				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.DeleteShift: shift uid is missing"),
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Shift uid is missing"),
 			},
 		}
 	}
@@ -185,7 +185,7 @@ func (s *Service) DeleteShift(ctx context.Context, req shiftsModels.DeleteShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.UnknownError.ErrorType,
 				ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-				ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.DeleteShift: failed to delete shift or its already deleted, shift_uid=%s, err=%s", req.ShiftUid, err.Error())),
+				ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Failed to delete shift or its already deleted, shift_uid=%s, err=%s", req.ShiftUid, err.Error())),
 			},
 		}
 	}
@@ -216,7 +216,7 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.MissingParamError.ErrorType,
 				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
-				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.UpdateShift: missing shift_uid in the request"),
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Missing shift_uid in the request"),
 			},
 		}
 	}
@@ -226,7 +226,7 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.MissingParamError.ErrorType,
 				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
-				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.UpdateShift: atleast one of the following params are required: work_date, shift_length_in_hours, assigned_user_email"),
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Atleast one of the following params are required: work_date, shift_length_in_hours, assigned_user_email"),
 			},
 		}
 	}
@@ -238,7 +238,7 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.ShiftNotFoundError.ErrorType,
 				ErrorMsg:   coreModels.ShiftNotFoundError.ErrorMsg,
-				ErrorStack: append(coreModels.ShiftNotFoundError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed to get shift, shift_uid=%s, err=%s", req.ShiftUid, err.Error())),
+				ErrorStack: append(coreModels.ShiftNotFoundError.ErrorStack, fmt.Sprintf("Failed to get shift, shift_uid=%s, err=%s", req.ShiftUid, err.Error())),
 			},
 		}
 	}
@@ -253,7 +253,7 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 				BaseResponse: &coreModels.BaseResponse{
 					ErrorType:  coreModels.UnknownError.ErrorType,
 					ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-					ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed to get user, user_email=%s, err=%s", req.AssignedUserEmail, err.Error())),
+					ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Failed to get user, user_email=%s, err=%s", req.AssignedUserEmail, err.Error())),
 				},
 			}
 		}
@@ -269,7 +269,7 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 					BaseResponse: &coreModels.BaseResponse{
 						ErrorType:  coreModels.UnknownError.ErrorType,
 						ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-						ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed to update shift user id, shift_uid=%s, user_email=%s, err=%s", req.ShiftUid, req.AssignedUserEmail, err.Error())),
+						ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Failed to update shift user id, shift_uid=%s, user_email=%s, err=%s", req.ShiftUid, req.AssignedUserEmail, err.Error())),
 					},
 				}
 			}
@@ -288,7 +288,7 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 				BaseResponse: &coreModels.BaseResponse{
 					ErrorType:  coreModels.UnknownError.ErrorType,
 					ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-					ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed to parse new work date, correct date format:%s shift_uid=%s, work_date=%s, err=%s", coreModels.YYYYMMDD_format, req.ShiftUid, req.WorkDate, err.Error())),
+					ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Failed to parse new work date, correct date format:%s shift_uid=%s, work_date=%s, err=%s", coreModels.YYYYMMDD_format, req.ShiftUid, req.WorkDate, err.Error())),
 				},
 			}
 		}
@@ -303,7 +303,7 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 					BaseResponse: &coreModels.BaseResponse{
 						ErrorType:  coreModels.UnknownError.ErrorType,
 						ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-						ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed update shift work date, shift_uid=%s, work_date=%s, err=%s", req.ShiftUid, req.WorkDate, err.Error())),
+						ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Failed update shift work date, shift_uid=%s, work_date=%s, err=%s", req.ShiftUid, req.WorkDate, err.Error())),
 					},
 				}
 			}
@@ -322,7 +322,7 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 				BaseResponse: &coreModels.BaseResponse{
 					ErrorType:  coreModels.InvalidParamError.ErrorType,
 					ErrorMsg:   coreModels.InvalidParamError.ErrorMsg,
-					ErrorStack: append(coreModels.InvalidParamError.ErrorStack, "Service.UpdateShift: shift_length_in_hours can not be less than 0.5 hours or more than 12 hours"),
+					ErrorStack: append(coreModels.InvalidParamError.ErrorStack, "Shift_length_in_hours can not be less than 0.5 hours or more than 12 hours"),
 				},
 			}
 		}
@@ -337,7 +337,7 @@ func (s *Service) UpdateShift(ctx context.Context, req shiftsModels.UpdateShiftR
 					BaseResponse: &coreModels.BaseResponse{
 						ErrorType:  coreModels.UnknownError.ErrorType,
 						ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-						ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.UpdateShift: failed update shift length, shift_uid=%s, shift_length_in_hours=%v, err=%s", req.ShiftUid, req.ShiftLenghtInHours, err.Error())),
+						ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Failed update shift length, shift_uid=%s, shift_length_in_hours=%v, err=%s", req.ShiftUid, req.ShiftLenghtInHours, err.Error())),
 					},
 				}
 			}
@@ -374,7 +374,7 @@ func (s *Service) GetShifts(ctx context.Context, req shiftsModels.GetShiftsReque
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.MissingParamError.ErrorType,
 				ErrorMsg:   coreModels.MissingParamError.ErrorMsg,
-				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Service.GetShifts: missing user_emails in the request"),
+				ErrorStack: append(coreModels.MissingParamError.ErrorStack, "Missing user_emails in the request"),
 			},
 		}
 	}
@@ -387,7 +387,7 @@ func (s *Service) GetShifts(ctx context.Context, req shiftsModels.GetShiftsReque
 				BaseResponse: &coreModels.BaseResponse{
 					ErrorType:  coreModels.InvalidParamError.ErrorType,
 					ErrorMsg:   coreModels.InvalidParamError.ErrorMsg,
-					ErrorStack: append(coreModels.InvalidParamError.ErrorStack, fmt.Sprintf("Service.GetShifts: failed to parse from_date, format should be like: %s", coreModels.YYYYMMDD_format)),
+					ErrorStack: append(coreModels.InvalidParamError.ErrorStack, fmt.Sprintf("Failed to parse from_date, format should be like: %s", coreModels.YYYYMMDD_format)),
 				},
 			}
 		}
@@ -405,7 +405,7 @@ func (s *Service) GetShifts(ctx context.Context, req shiftsModels.GetShiftsReque
 				BaseResponse: &coreModels.BaseResponse{
 					ErrorType:  coreModels.InvalidParamError.ErrorType,
 					ErrorMsg:   coreModels.InvalidParamError.ErrorMsg,
-					ErrorStack: append(coreModels.InvalidParamError.ErrorStack, fmt.Sprintf("Service.GetShifts: failed to parse to_date, format should be like: %s", coreModels.YYYYMMDD_format)),
+					ErrorStack: append(coreModels.InvalidParamError.ErrorStack, fmt.Sprintf("Failed to parse to_date, format should be like: %s", coreModels.YYYYMMDD_format)),
 				},
 			}
 		}
@@ -421,7 +421,7 @@ func (s *Service) GetShifts(ctx context.Context, req shiftsModels.GetShiftsReque
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.InvalidDateRangeError.ErrorType,
 				ErrorMsg:   coreModels.InvalidDateRangeError.ErrorMsg,
-				ErrorStack: append(coreModels.InvalidDateRangeError.ErrorStack, "Service.GetShifts: to_date can not be before from_date"),
+				ErrorStack: append(coreModels.InvalidDateRangeError.ErrorStack, "to_date can not be before from_date"),
 			},
 		}
 	}
@@ -437,7 +437,7 @@ func (s *Service) GetShifts(ctx context.Context, req shiftsModels.GetShiftsReque
 			BaseResponse: &coreModels.BaseResponse{
 				ErrorType:  coreModels.UnknownError.ErrorType,
 				ErrorMsg:   coreModels.UnknownError.ErrorMsg,
-				ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Service.GetShifts: failed to fetch users shifts err=%s", err.Error())),
+				ErrorStack: append(coreModels.UnknownError.ErrorStack, fmt.Sprintf("Failed to fetch users shifts err=%s", err.Error())),
 			},
 		}
 	}

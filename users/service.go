@@ -51,8 +51,9 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 	if req.Email == "" {
 		return &userModels.CreateUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Missing params",
-				ErrorMsg:  "Users email is missing",
+				ErrorType:  models.MissingParamError.ErrorType,
+				ErrorMsg:   models.MissingParamError.ErrorMsg,
+				ErrorStack: append(models.MissingParamError.ErrorStack, "User email is missing"),
 			},
 		}
 	}
@@ -60,8 +61,9 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 	if req.FirstName == "" {
 		return &userModels.CreateUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Missing params",
-				ErrorMsg:  "Users first name is missing",
+				ErrorType:  models.MissingParamError.ErrorType,
+				ErrorMsg:   models.MissingParamError.ErrorMsg,
+				ErrorStack: append(models.MissingParamError.ErrorStack, "User first_name is missing"),
 			},
 		}
 	}
@@ -69,8 +71,9 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 	if req.LastName == "" {
 		return &userModels.CreateUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Missing params",
-				ErrorMsg:  "Users last name is missing",
+				ErrorType:  models.MissingParamError.ErrorType,
+				ErrorMsg:   models.MissingParamError.ErrorMsg,
+				ErrorStack: append(models.MissingParamError.ErrorStack, "User last_name is missing"),
 			},
 		}
 	}
@@ -78,8 +81,9 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 	if req.Password == "" {
 		return &userModels.CreateUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Missing params",
-				ErrorMsg:  "Password is required",
+				ErrorType:  models.MissingParamError.ErrorType,
+				ErrorMsg:   models.MissingParamError.ErrorMsg,
+				ErrorStack: append(models.MissingParamError.ErrorStack, "User password is missing"),
 			},
 		}
 	}
@@ -88,15 +92,17 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 	if err != nil && err.Error() != sql.ErrNoRows.Error() {
 		return &userModels.CreateUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Unknown Error",
-				ErrorMsg:  err.Error(),
+				ErrorType:  models.UnknownError.ErrorType,
+				ErrorMsg:   models.UnknownError.ErrorMsg,
+				ErrorStack: append(models.UnknownError.ErrorStack, err.Error()),
 			},
 		}
 	} else if (err == nil && resp != sqlc.User{}) {
 		return &userModels.CreateUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "User already exists",
-				ErrorMsg:  "User is already registered",
+				ErrorType:  models.UserAlreadyExistError.ErrorType,
+				ErrorMsg:   models.UserAlreadyExistError.ErrorMsg,
+				ErrorStack: append(models.UserAlreadyExistError.ErrorStack, "User is already registered, use login instead"),
 			},
 		}
 	}
@@ -106,8 +112,9 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 	if err != nil {
 		return &userModels.CreateUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Password hashing failed",
-				ErrorMsg:  err.Error(),
+				ErrorType:  models.UnknownError.ErrorType,
+				ErrorMsg:   models.UnknownError.ErrorMsg,
+				ErrorStack: append(models.UnknownError.ErrorStack, err.Error()),
 			},
 		}
 	}
@@ -130,8 +137,9 @@ func (s *Service) CreateUser(ctx context.Context, req userModels.CreateUserReque
 	if err != nil {
 		return &userModels.CreateUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Unknown error",
-				ErrorMsg:  err.Error(),
+				ErrorType:  models.UnknownError.ErrorType,
+				ErrorMsg:   models.UnknownError.ErrorMsg,
+				ErrorStack: append(models.UnknownError.ErrorStack, err.Error()),
 			},
 		}
 	}
@@ -162,8 +170,9 @@ func (s *Service) GetUserByEmail(ctx context.Context, req userModels.GetUserByEm
 	if req.Email == "" {
 		return &userModels.GetUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Missing Parameters",
-				ErrorMsg:  "Missing parameters, email and phone number could not be found.",
+				ErrorType:  models.MissingParamError.ErrorType,
+				ErrorMsg:   models.MissingParamError.ErrorMsg,
+				ErrorStack: append(models.MissingParamError.ErrorStack, "User email is missing"),
 			},
 		}
 	}
@@ -173,16 +182,18 @@ func (s *Service) GetUserByEmail(ctx context.Context, req userModels.GetUserByEm
 		if err.Error() == sql.ErrNoRows.Error() {
 			return &userModels.GetUserResponse{
 				BaseResponse: &models.BaseResponse{
-					ErrorType: "User does not exist.",
-					ErrorMsg:  err.Error(),
+					ErrorType: models.UserDoesNotExistError.ErrorType,
+					ErrorMsg:  models.UserDoesNotExistError.ErrorMsg,
 				},
 			}
 
 		} else {
+			fmt.Printf("Service.GetUserByEmail: failed to get user, user_email=%s err=%s", req.Email, err.Error())
+
 			return &userModels.GetUserResponse{
 				BaseResponse: &models.BaseResponse{
-					ErrorType: "Unknown error.",
-					ErrorMsg:  err.Error(),
+					ErrorType: models.UnknownError.ErrorType,
+					ErrorMsg:  models.UnknownError.ErrorMsg,
 				},
 			}
 		}
@@ -214,8 +225,9 @@ func (s *Service) GetUserByUID(ctx context.Context, userUID string) *userModels.
 	if userUID == "" {
 		return &userModels.GetUserResponse{
 			BaseResponse: &models.BaseResponse{
-				ErrorType: "Missing Parameters",
-				ErrorMsg:  "Missing parameters, user uid could not be found.",
+				ErrorType:  models.MissingParamError.ErrorType,
+				ErrorMsg:   models.MissingParamError.ErrorMsg,
+				ErrorStack: append(models.MissingParamError.ErrorStack, "User uid is missing"),
 			},
 		}
 	}
@@ -225,16 +237,18 @@ func (s *Service) GetUserByUID(ctx context.Context, userUID string) *userModels.
 		if err.Error() == sql.ErrNoRows.Error() {
 			return &userModels.GetUserResponse{
 				BaseResponse: &models.BaseResponse{
-					ErrorType: "User does not exist.",
-					ErrorMsg:  err.Error(),
+					ErrorType: models.UserDoesNotExistError.ErrorType,
+					ErrorMsg:  models.UserDoesNotExistError.ErrorMsg,
 				},
 			}
 
 		} else {
+			fmt.Printf("Service.GetUserByUID: failed to get user, user_uid=%s err=%s", userUID, err.Error())
+
 			return &userModels.GetUserResponse{
 				BaseResponse: &models.BaseResponse{
-					ErrorType: "Unknown error.",
-					ErrorMsg:  err.Error(),
+					ErrorType: models.UnknownError.ErrorType,
+					ErrorMsg:  models.UnknownError.ErrorMsg,
 				},
 			}
 		}
@@ -389,7 +403,7 @@ func (s *Service) GetAllUsersWithShifts(ctx context.Context, req userModels.GetA
 				BaseResponse: &models.BaseResponse{
 					ErrorType:  models.InvalidParamError.ErrorType,
 					ErrorMsg:   models.InvalidParamError.ErrorMsg,
-					ErrorStack: append(models.InvalidParamError.ErrorStack, fmt.Sprintf("Service.GetAllUsers: failed to parse from_date, format should be like: %s", models.YYYYMMDD_format)),
+					ErrorStack: append(models.InvalidParamError.ErrorStack, fmt.Sprintf("Failed to parse from_date, format should be like: %s", models.YYYYMMDD_format)),
 				},
 			}
 		}
@@ -407,7 +421,7 @@ func (s *Service) GetAllUsersWithShifts(ctx context.Context, req userModels.GetA
 				BaseResponse: &models.BaseResponse{
 					ErrorType:  models.InvalidParamError.ErrorType,
 					ErrorMsg:   models.InvalidParamError.ErrorMsg,
-					ErrorStack: append(models.InvalidParamError.ErrorStack, fmt.Sprintf("Service.GetAllUsers: failed to parse to_date, format should be like: %s", models.YYYYMMDD_format)),
+					ErrorStack: append(models.InvalidParamError.ErrorStack, fmt.Sprintf("Failed to parse to_date, format should be like: %s", models.YYYYMMDD_format)),
 				},
 			}
 		}
@@ -423,7 +437,7 @@ func (s *Service) GetAllUsersWithShifts(ctx context.Context, req userModels.GetA
 			BaseResponse: &models.BaseResponse{
 				ErrorType:  models.InvalidDateRangeError.ErrorType,
 				ErrorMsg:   models.InvalidDateRangeError.ErrorMsg,
-				ErrorStack: append(models.InvalidDateRangeError.ErrorStack, "Service.GetAllUsers: to_date can not be before from_date"),
+				ErrorStack: append(models.InvalidDateRangeError.ErrorStack, "to_date can not be before from_date"),
 			},
 		}
 	}
@@ -438,7 +452,7 @@ func (s *Service) GetAllUsersWithShifts(ctx context.Context, req userModels.GetA
 			BaseResponse: &models.BaseResponse{
 				ErrorType:  models.UnknownError.ErrorType,
 				ErrorMsg:   models.UnknownError.ErrorMsg,
-				ErrorStack: append(models.UnknownError.ErrorStack, fmt.Sprintf("Service.GetAllUsers: failed to get all users with shifts, err=%s", err.Error())),
+				ErrorStack: append(models.UnknownError.ErrorStack, fmt.Sprintf("Failed to get all users with shifts, err=%s", err.Error())),
 			},
 		}
 	}

@@ -4,12 +4,14 @@ type Errors BaseResponse
 
 var (
 	// Validations
-	MissingParamError     = BaseResponse{Success: false, ErrorType: "MISSING_PARAMETER", ErrorMsg: "Request parameter(s) missing", ErrorStack: []string{}}
-	InvalidParamError     = BaseResponse{Success: false, ErrorType: "INVALID_PARAMETER", ErrorMsg: "Request parameter(s) is invalid", ErrorStack: []string{}}
-	InvalidDateRangeError = BaseResponse{Success: false, ErrorType: "INVALID_DATE_RANGE", ErrorMsg: "Date range is invalid", ErrorStack: []string{}}
+	MissingParamError       = BaseResponse{Success: false, ErrorType: "MISSING_PARAMETER", ErrorMsg: "Request parameter(s) missing", ErrorStack: []string{}}
+	InvalidCredentialsError = BaseResponse{Success: false, ErrorType: "INVALID_CREDENTIALS", ErrorMsg: "Invalid credentials", ErrorStack: []string{}}
+	InvalidParamError       = BaseResponse{Success: false, ErrorType: "INVALID_PARAMETER", ErrorMsg: "Request parameter(s) is invalid", ErrorStack: []string{}}
+	InvalidDateRangeError   = BaseResponse{Success: false, ErrorType: "INVALID_DATE_RANGE", ErrorMsg: "Date range is invalid", ErrorStack: []string{}}
 
 	// User
 	UserDoesNotExistError = BaseResponse{Success: false, ErrorType: "DOES_NOT_EXIST", ErrorMsg: "User does not exist", ErrorStack: []string{}}
+	UserAlreadyExistError = BaseResponse{Success: false, ErrorType: "ALREADY_EXIST", ErrorMsg: "User already exist", ErrorStack: []string{}}
 
 	// Shifts
 	ShiftAlreadyExistError = BaseResponse{Success: false, ErrorType: "SHIFT_ALREADY_EXIST", ErrorMsg: "User already have a shift booked for this day", ErrorStack: []string{}}

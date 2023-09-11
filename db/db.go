@@ -20,23 +20,12 @@ func EstablishDBConnection() *sql.DB {
 		dbname     string
 	)
 
-	env, _ := os.LookupEnv("environment")
+	host, _ = os.LookupEnv("DB_HOST")
+	username, _ = os.LookupEnv("DB_USER")
+	password, _ = os.LookupEnv("DB_PASSWORD")
+	portString, _ = os.LookupEnv("DB_PORT")
+	dbname, _ = os.LookupEnv("DB_NAME")
 
-	if env == "local" {
-
-		host, _ = os.LookupEnv("host_local")
-		username, _ = os.LookupEnv("username_local")
-		password, _ = os.LookupEnv("password_local")
-		portString, _ = os.LookupEnv("port_local")
-		dbname, _ = os.LookupEnv("dbname_local")
-	} else {
-
-		host, _ = os.LookupEnv("host")
-		username, _ = os.LookupEnv("username")
-		password, _ = os.LookupEnv("password")
-		portString, _ = os.LookupEnv("port")
-		dbname, _ = os.LookupEnv("dbname")
-	}
 	// port from string to int
 	port, _ = strconv.ParseInt(portString, 10, 0)
 
